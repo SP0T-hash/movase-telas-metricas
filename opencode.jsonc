@@ -1,0 +1,25 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "skill": {
+      "*": "allow",
+      "emil-design-eng": "allow",
+      "impeccable": "allow",
+      "design-taste-frontend": "allow"
+    }
+  },
+  "instructions": ["AGENTS.md"],
+  "plugin": ["@dietrichgebert/ponytail"],
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "enabled": true
+    },
+    "figma": {
+      "type": "remote",
+      "url": "https://mcp.figma.com/mcp",
+      "enabled": false
+    }
+  }
+}

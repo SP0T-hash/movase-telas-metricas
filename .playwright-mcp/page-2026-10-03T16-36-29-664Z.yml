@@ -1,0 +1,42 @@
+- generic [ref=f2e2]:
+  - banner [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - button "Voltar" [ref=f2e5] [cursor=pointer]
+      - generic [ref=f2e8]:
+        - generic [ref=f2e9]: Atividade compartilhada
+        - generic [ref=f2e10]: Treino de hoje
+      - button "Compartilhar" [ref=f2e11] [cursor=pointer]
+    - tablist "Esporte" [ref=f2e14]:
+      - tab "Corrida" [selected] [ref=f2e15] [cursor=pointer]
+      - tab "Musculação" [ref=f2e16] [cursor=pointer]
+      - tab "Calistenia" [ref=f2e17] [cursor=pointer]
+      - tab "Ciclismo" [ref=f2e18] [cursor=pointer]
+  - generic [ref=f2e19]:
+    - generic [ref=f2e20]:
+      - heading "Vocês treinaram juntos" [level=1] [ref=f2e21]
+      - paragraph
+      - generic [ref=f2e22]:
+        - generic [ref=f2e23]:
+          - generic [aria-hidden] [ref=f2e24]: VC
+          - generic [ref=f2e25]: Você
+        - generic [ref=f2e27]: VS
+        - generic [ref=f2e28]:
+          - generic [aria-hidden] [ref=f2e29]: RA
+          - generic [ref=f2e30]: Rafa Almeida
+    - generic [ref=f2e32]:
+      - generic [ref=f2e34]:
+        - generic [ref=f2e35]: Você
+        - generic [ref=f2e37]: Rafa
+      - group "Modo de comparação do mapa" [ref=f2e40]:
+        - button "Dividir" [pressed] [ref=f2e41] [cursor=pointer]
+        - button "Sobrepor" [ref=f2e42] [cursor=pointer]
+      - button "Centralizar mapa" [ref=f2e43] [cursor=pointer]
+    - generic [ref=f2e48]:
+      - heading [level=2]
+    - generic [ref=f2e49]:
+      - textbox "Comentário" [ref=f2e50]:
+        - /placeholder: Comentar com Rafa…
+      - button "Enviar" [disabled] [ref=f2e51]
+    - button "Convidar para o próximo" [ref=f2e52] [cursor=pointer]
+    - paragraph
+  - complementary

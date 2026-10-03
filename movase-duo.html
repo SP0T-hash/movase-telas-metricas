@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Movase — Atividade compartilhada</title>
+<style>
+/* ══ Tokens — extraídos do movase.fit por CSS computado ══ */
+:root{
+  /* laranja é a marca; -deep existe porque #f58220 sozinho não passa
+     4.5:1 em texto. -ink é o texto sobre o laranja sólido (7.6:1). */
+  /* Contrato de tokens extraído do app Android v2.2.21 — res/raw/theme.json
+     (light). Nomes preservados do app. Só accent-on diverge, por AA: o app
+     usa #FFFFFF sobre #F58220 = 2.59:1, reprovado em texto e em UI. */
+  --accent:#F58220; --accent-on:#0A0A0A;      /* app diz #FFFFFF — 2.59:1, falha */
+  --bg:#FFFFFF; --fg:#0A0A0A; --fg-2:#57534E; --meta:#57534E;
+  --muted:#F5F5F4; --surface:#F5F5F4; --surface-warm:#FFF4E8;
+  --border:#E7E5E4; --place-blue:#003399;
+  /* aliases usados pelo layout */
+  --brand:var(--accent); --duo:var(--place-blue);
+  --ink:var(--fg); --ink-3:var(--fg-2); --ink-4:var(--meta);
+  --paper:var(--bg); --rule:var(--border); --rule-2:#F0EFEE;
+  --brand-deep:#a8560c; --duo-deep:#00256b;   /* escurecidos p/ texto sobre o mapa */
+  --brand-soft:rgba(245,130,32,.13); --duo-soft:rgba(0,51,153,.10);
+  --brand-map:#8a3f08; --neutral-map:#6b6a68; /* mesmo motivo */
+  /* radius do contrato: pill 9999 / md 20 / sm 8 */
+  --r-s:8px; --r-m:12px; --r-l:20px; --r-xl:26px; --r-pill:9999px;
+  --sh-1:0 1px 2px rgba(12,10,9,.05);
+  --sh-2:0 1px 2px rgba(12,10,9,.04), 0 6px 16px -6px rgba(12,10,9,.10);
+  --sh-3:0 2px 4px rgba(12,10,9,.05), 0 18px 40px -14px rgba(12,10,9,.20);
+  /* Emil: curvas próprias, nunca ease-in em UI */
+  --e-out:cubic-bezier(.23,1,.32,1);
+  --e-io:cubic-bezier(.77,0,.175,1);
+  --e-drawer:cubic-bezier(.32,.72,0,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Noto Sans,Arial,sans-serif;
+  background:var(--paper);color:var(--ink);font-size:15px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;padding-bottom:48px;
+}
+.wrap{max-width:452px;margin:0 auto}
+.t-display{font-size:27px;line-height:1.1;font-weight:900;letter-spacing:-.9px}
+.t-sec{font-size:14px;font-weight:800;letter-spacing:-.25px}
+.t-lab{font-size:11px;font-weight:800;letter-spacing:.085em;text-transform:uppercase;color:var(--ink-3)}
+.t-num{font-variant-numeric:tabular-nums;font-weight:900;letter-spacing:-1px}
+.muted{color:var(--ink-3)}
+
+/* ══ App bar ══ */
+.bar{position:sticky;top:0;z-index:20;background:rgba(250,250,249,.86);
+  backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--rule);padding:14px 16px 12px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.ib{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border:1px solid var(--rule);
+  background:var(--surface);border-radius:var(--r-pill);cursor:pointer;
+  transition:transform 160ms var(--e-out),background-color 160ms var(--e-out)}
+.ib:active{transform:scale(.94)}
+.ib svg{width:18px;height:18px;stroke:var(--ink);stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ══ Segmented ══ */
+.seg{display:flex;gap:3px;background:var(--rule-2);padding:3px;border-radius:var(--r-pill);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;border:0;background:none;padding:8px 13px;min-height:34px;
+  border-radius:var(--r-pill);
+  font:800 12.5px/1.2 inherit;color:var(--ink-3);cursor:pointer;white-space:nowrap;
+  transition:color 180ms var(--e-out),background-color 180ms var(--e-out),transform 140ms var(--e-out)}
+.seg button[aria-selected="true"]{background:var(--ink);color:#fff}
+.seg button:active{transform:scale(.95)}
+
+/* ══ Duo ══ */
+.duo{padding:18px 16px 14px}
+.duo-row{display:flex;align-items:center;gap:8px;margin-top:14px}
+.ath{flex:1;min-width:0;display:flex;align-items:center;gap:9px}
+.ath.r{flex-direction:row-reverse;text-align:right}
+.av{width:40px;height:40px;flex:0 0 40px;border-radius:var(--r-pill);display:grid;place-items:center;
+  font:900 14px/1 inherit;color:#fff;border:2.5px solid var(--brand);background:var(--brand);
+  letter-spacing:-.3px;user-select:none}
+.av.b{border-color:var(--duo);background:var(--duo)}
+.an{min-width:0}
+.an b{display:block;font-size:13.5px;font-weight:800;letter-spacing:-.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an small{display:block;font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs{flex:0 0 auto;font:900 12px/1 inherit;color:var(--ink-4);letter-spacing:.5px;
+  padding:5px 8px;border:1px solid var(--rule);border-radius:var(--r-pill)}
+
+/* ══ Map ══ */
+.map{position:relative;margin:0 16px;border-radius:var(--r-xl);overflow:hidden;background:#f1efe9;
+  box-shadow:var(--sh-2);aspect-ratio:4/5;touch-action:pan-y}
+.map>svg{display:block;width:100%;height:100%}
+.chip{position:absolute;top:10px;display:flex;gap:5px}
+.chip.l{left:10px} .chip.r{right:10px}
+.chip span{font:800 10.5px/1 inherit;letter-spacing:.04em;padding:6px 9px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.94);box-shadow:var(--sh-1);display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:var(--r-pill);flex:0 0 7px}
+.dot.a{background:var(--brand)} .dot.b{background:var(--duo)}
+/* Emil: switch com tabs — duplica a copy, anima o clip */
+.sw{display:flex;gap:2px;background:rgba(255,255,255,.94);box-shadow:var(--sh-1);
+  padding:3px;border-radius:var(--r-pill)}
+.sw button{border:0;background:none;padding:7px 11px;min-height:32px;border-radius:var(--r-pill);
+  font:800 11.5px/1.2 inherit;color:var(--ink-3);cursor:pointer;
+  transition:color 160ms var(--e-out),background-color 160ms var(--e-out)}
+.sw button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.divider{position:absolute;inset:0;pointer-events:none}
+.div-handle{position:absolute;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.97);box-shadow:var(--sh-2);display:grid;place-items:center;
+  transform:translateX(var(--x,50%))}
+.div-line{position:absolute;top:0;bottom:0;left:var(--x,50%);width:2px;background:rgba(12,10,9,.34)}
+/* track visível só no foco por teclado — no toque quem arrasta é o dedo */
+.map input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.map input[type=range]:focus-visible{outline:2px solid var(--brand);outline-offset:-3px;border-radius:var(--r-xl)}
+.fab{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:var(--r-pill);
+  display:grid;place-items:center;background:rgba(255,255,255,.95);box-shadow:var(--sh-2);cursor:pointer;
+  transition:transform 160ms var(--e-out)}
+.fab:active{transform:scale(.92)}
+.fab svg{width:17px;height:17px;stroke:var(--ink);stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ══ Panels ══ */
+.panel{margin:14px 16px 0;border:1px solid var(--rule);border-radius:var(--r-xl);
+  background:var(--surface);box-shadow:var(--sh-2);overflow:hidden}
+.panel-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px 16px 10px}
+.panel-h .t-lab{flex:0 0 auto}
+
+/* ══ Métricas lado a lado ══ */
+.mrow{padding:12px 16px;border-top:1px solid var(--rule-2)}
+.mrow:first-child{border-top:0}
+.mtop{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.mval{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.mval b{font-size:21px;line-height:1.1}
+.mval .u{font-size:12px;font-weight:800;color:var(--ink-3);letter-spacing:-.1px}
+.slash{color:var(--ink-4);font-weight:700;font-size:15px}
+.win{font-size:11.5px;font-weight:800;padding:4px 8px;border-radius:var(--r-pill);
+  letter-spacing:-.1px;white-space:nowrap;flex:0 0 auto}
+.win.a{background:var(--brand-soft);color:var(--brand-deep)}
+.win.b{background:var(--duo-soft);color:var(--duo)}
+.win.tie{background:var(--rule-2);color:var(--ink-3)}
+/* Emil: anima só transform — scaleX, nunca width */
+.track{height:7px;border-radius:var(--r-pill);background:var(--rule-2);overflow:hidden;
+  transform:translateZ(0)}
+.fill{height:100%;border-radius:var(--r-pill);transform:scaleX(0);transform-origin:left;
+  transition:transform 520ms var(--e-out)}
+.fill.a{background:var(--brand)} .fill.b{background:var(--duo)}
+.bars{margin-top:9px;display:flex;flex-direction:column;gap:4px}
+
+/* ══ Distribuição de sessão (musculação) ══ */
+.ex{padding:12px 16px;border-top:1px solid var(--rule-2)}
+.ex:first-child{border-top:0}
+.ex-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:9px}
+.ex-h b{font-size:13.5px;font-weight:800;letter-spacing:-.2px}
+.ex-h span{font-size:11.5px;color:var(--ink-3);font-weight:700;flex:0 0 auto}
+.split{display:flex;height:9px;border-radius:var(--r-pill);overflow:hidden;background:var(--rule-2);gap:2px}
+.split i{display:block;height:100%;transform:scaleX(0);transform-origin:left;
+  transition:transform 520ms var(--e-out)}
+.split i.a{background:var(--brand)} .split i.b{background:var(--duo)}
+.splitn{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;font-weight:800}
+.splitn .a{color:var(--brand-deep)} .splitn .b{color:var(--duo)}
+
+/* ══ Grade de séries (calistenia) ══ */
+.reps{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--rule-2)}
+.rep{background:var(--surface);padding:13px 16px}
+.rep b{display:block;font-size:19px;margin-top:3px;line-height:1.2}
+.rep .a{color:var(--brand-deep)} .rep .b{color:var(--duo)}
+.hold{margin-top:6px;height:5px;border-radius:var(--r-pill);background:var(--rule-2);overflow:hidden}
+.hold i{display:block;height:100%;border-radius:var(--r-pill);transform:scaleX(0);
+  transform-origin:left;transition:transform 520ms var(--e-out)}
+.hold i.a{background:var(--brand)} .hold i.b{background:var(--duo)}
+
+/* ══ Gamificação ══ */
+.gam{margin:14px 16px 0;border-radius:var(--r-xl);padding:15px 16px;background:var(--ink);
+  color:#fff;box-shadow:var(--sh-3);position:relative;overflow:hidden}
+.gam::after{content:"";position:absolute;right:-46px;top:-46px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,130,32,.40),transparent 68%)}
+.gam>*{position:relative;z-index:1}
+.gam .t-lab{color:rgba(255,255,255,.72)}
+.gam-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.streak{display:flex;align-items:baseline;gap:7px;margin-top:6px}
+.streak b{font-size:30px;line-height:1}
+.streak span{font-size:12px;font-weight:800;color:rgba(255,255,255,.72)}
+.xp{font:800 11px/1 inherit;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;
+  border-radius:var(--r-pill);background:rgba(245,130,32,.2);color:#ffd7b0;
+  border:1px solid rgba(245,130,32,.38);flex:0 0 auto}
+.gam-note{margin-top:11px;font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.45}
+.gam-cta{display:block;width:100%;margin-top:13px;padding:12px;border:1px solid rgba(255,255,255,.26);
+  border-radius:var(--r-pill);background:rgba(255,255,255,.1);color:#fff;font:800 12.5px/1 inherit;
+  cursor:pointer;transition:transform 160ms var(--e-out),background-color 160ms var(--e-out)}
+.gam-cta:active{transform:scale(.97)}
+.gam-cta[disabled]{opacity:.5}
+
+/* ══ Recordes ══ */
+.pr{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid var(--rule-2)}
+.pr:first-of-type{border-top:0}
+.pr-ic{width:36px;height:36px;flex:0 0 36px;border-radius:var(--r-m);display:grid;place-items:center;
+  background:var(--brand-soft)}
+.pr-ic svg{width:18px;height:18px;stroke:var(--brand-deep);stroke-width:2.1;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.pr-t{min-width:0;flex:1}
+.pr-t b{display:block;font-size:13.5px;font-weight:800;letter-spacing:-.2px}
+.pr-t small{font-size:11.5px;color:var(--ink-3)}
+.pr-d{font:900 13px/1 inherit;color:var(--brand-deep);white-space:nowrap;flex:0 0 auto}
+
+/* ══ Comentário ══ */
+.say{margin:14px 16px 0;display:flex;align-items:center;gap:9px;padding:9px 9px 9px 14px;
+  border:1px solid var(--rule);border-radius:var(--r-pill);background:var(--surface);box-shadow:var(--sh-1);
+  transition:border-color 180ms var(--e-out),box-shadow 180ms var(--e-out)}
+.say:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.say input{flex:1;min-width:0;border:0;background:none;font:600 14px/1 inherit;color:var(--ink);outline:none}
+.say input::placeholder{color:var(--ink-4);font-weight:600}
+.say button{border:0;background:var(--ink);color:#fff;font:800 12.5px/1 inherit;padding:9px 14px;min-height:34px;
+  border-radius:var(--r-pill);cursor:pointer;white-space:nowrap;
+  transition:transform 160ms var(--e-out),opacity 180ms var(--e-out)}
+.say button:active{transform:scale(.95)}
+.say button:disabled{opacity:.32;cursor:default}
+
+/* ══ CTA ══ */
+/* texto escuro sobre o laranja: branco daria 2.59:1 */
+.cta{display:block;width:calc(100% - 32px);margin:14px 16px 0;padding:16px;border:0;
+  border-radius:var(--r-pill);background:var(--brand);color:var(--brand-on);
+  font:900 15px/1 inherit;letter-spacing:-.2px;cursor:pointer;
+  box-shadow:0 2px 4px rgba(168,86,12,.22),0 12px 28px -10px rgba(245,130,32,.55);
+  transition:transform 160ms var(--e-out),filter 180ms var(--e-out)}
+.cta:active{transform:scale(.975)}
+.cta-sub{display:block;margin-top:11px;text-align:center;font-size:11.5px;color:var(--ink-4);font-weight:600}
+
+/* ══ Foco visível (o anel some no input do .say, então fica aqui) ══ */
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:6px}
+
+/* ══ Entrada: stagger curto, nada bloqueante ══ */
+.rise{opacity:0;transform:translateY(8px);animation:rise 320ms var(--e-out) forwards}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+/* Emil: blur mascara crossfade imperfeito na troca de esporte */
+.swap{animation:swap 260ms var(--e-out)}
+@keyframes swap{from{opacity:.35;filter:blur(3px)}to{opacity:1;filter:blur(0)}}
+
+/* hover só em ponteiro fino — evita falso positivo no toque */
+@media (hover:hover) and (pointer:fine){
+  .ib:hover{background:var(--rule-2)}
+  .seg button:hover:not([aria-selected="true"]){color:var(--ink)}
+  .cta:hover{filter:brightness(1.07)}
+  .fab:hover{background:#fff}
+  .gam-cta:hover{background:rgba(255,255,255,.14)}
+}
+
+/* Sem movimento: o estado final é aplicado na hora. Não zeramos o transform,
+   senão as barras ficam vazias e o dado some. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rise{opacity:1;transform:none}
+}
+
+@media (min-width:560px){
+  body{padding:34px 0}
+  .wrap{background:var(--paper);box-shadow:var(--sh-3);border-radius:30px;overflow:hidden;
+    border:1px solid var(--rule)}
+  .bar{position:static}
+}
+
+/* ══ Desktop: duas colunas ══ */
+@media (min-width:1000px){
+  body{padding:0;background:#f1efea}
+  .wrap{max-width:1120px;display:grid;grid-template-columns:minmax(0,1fr) 400px;align-content:start;
+    background:var(--surface);min-height:100vh}
+  .bar{grid-column:1/-1}
+  .col-l{padding-bottom:28px}
+  .col-r{border-left:1px solid var(--rule);background:var(--paper);min-width:0}
+  .map{margin-right:0;border-radius:0;aspect-ratio:16/10}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="bar">
+    <div class="bar-row">
+      <button class="ib" aria-label="Voltar">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div style="flex:1;min-width:0">
+        <div class="t-lab" style="margin-bottom:1px">Atividade compartilhada</div>
+        <div class="t-sec" style="font-size:19px;letter-spacing:-.45px">Treino de hoje</div>
+      </div>
+      <button class="ib" aria-label="Compartilhar">
+        <svg viewBox="0 0 24 24"><path d="M12 15V3m0 0L8 7m4-4l4 4M4 13v6a2 2 0 002 2h12a2 2 0 002-2v-6"/></svg>
+      </button>
+    </div>
+    <div class="seg" role="tablist" aria-label="Esporte" style="margin-top:12px">
+      <button role="tab" aria-selected="true"  data-s="run">Corrida</button>
+      <button role="tab" aria-selected="false" data-s="gym">Musculação</button>
+      <button role="tab" aria-selected="false" data-s="cal">Calistenia</button>
+      <button role="tab" aria-selected="false" data-s="ride">Ciclismo</button>
+    </div>
+  </header>
+
+  <div class="col-l">
+
+    <section class="duo">
+      <h1 class="t-display">Vocês treinaram juntos</h1>
+      <p class="muted" style="font-size:13.5px;margin-top:5px" data-when></p>
+      <div class="duo-row">
+        <div class="ath r">
+          <span class="av a" aria-hidden="true">VC</span>
+          <span class="an"><b>Você</b><small data-you-sub></small></span>
+        </div>
+        <span class="vs">VS</span>
+        <div class="ath">
+          <span class="av b" aria-hidden="true">RA</span>
+          <span class="an"><b>Rafa Almeida</b><small data-them-sub></small></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ Mapa / piso / praça — a forma muda por esporte ══ -->
+    <div class="map" data-map>
+      <svg viewBox="0 0 340 425" preserveAspectRatio="xMidYMid slice" data-svg aria-hidden="true"></svg>
+
+      <div class="chip l">
+        <span><i class="dot a"></i>Você</span>
+        <span><i class="dot b"></i>Rafa</span>
+      </div>
+
+      <div class="chip r" data-ctl hidden>
+        <div class="sw" role="group" aria-label="Modo de comparação do mapa">
+          <button data-mode="split" aria-pressed="true">Dividir</button>
+          <button data-mode="over" aria-pressed="false">Sobrepor</button>
+        </div>
+      </div>
+
+      <div class="divider" data-div hidden>
+        <div class="div-line"></div>
+        <div class="div-handle">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#0c0a09"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 7l-4 5 4 5M15 7l4 5-4 5"/>
+          </svg>
+        </div>
+        <input type="range" min="8" max="92" value="50" data-range
+               aria-label="Divisor de comparação do mapa">
+      </div>
+
+      <button class="fab" aria-label="Centralizar mapa">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+    </div>
+
+    <section class="panel" data-metrics>
+      <div class="panel-h">
+        <h2 class="t-sec" data-metric-title></h2>
+        <span class="t-lab" data-verdict></span>
+      </div>
+      <div data-rows></div>
+    </section>
+
+    <section class="panel" data-ex-wrap hidden>
+      <div class="panel-h"><h2 class="t-sec">Onde cada um passou o tempo</h2><span class="t-lab">min</span></div>
+      <div data-ex></div>
+    </section>
+
+    <section class="panel" data-rep-wrap hidden>
+      <div class="panel-h"><h2 class="t-sec">Volume corporal</h2><span class="t-lab">total dos dois</span></div>
+      <div class="reps" data-reps></div>
+    </section>
+
+    <section class="panel" data-prs-wrap>
+      <div class="panel-h"><h2 class="t-sec">Recordes do duo</h2><span class="t-lab">últimos 90 dias</span></div>
+      <div data-prs></div>
+    </section>
+
+    <form class="say" data-say>
+      <input type="text" placeholder="Comentar com Rafa…" aria-label="Comentário" data-cmt>
+      <button type="submit" disabled data-send>Enviar</button>
+    </form>
+
+    <button class="cta ctax" data-cta>Convidar para o próximo</button>
+    <p class="cta-sub" data-cta-sub></p>
+  </div>
+
+  <aside class="col-r" data-colr>
+    <section class="gam ctax-host">
+      <div class="gam-top">
+        <div>
+          <div class="t-lab">Sequência juntos</div>
+          <div class="streak"><b data-streak>6</b><span>treinos no mesmo dia</span></div>
+        </div>
+        <span class="xp" data-xp>+320 XP</span>
+      </div>
+      <p class="gam-note" data-gam-note></p>
+      <button class="gam-cta ctax" data-gam-cta type="button">Ver a série</button>
+    </section>
+  </aside>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   Dados por esporte. Cada esporte define:
+     map  → 'route' (GPS) | 'floor' (academia, posição aproximada) | 'park'
+     win  → quem levou a métrica: 1 você · 2 Rafa · 0 empate
+══════════════════════════════════════════════════════════════ */
+const SPORTS = {
+  run: {
+    map:'route', mapAria:'Mapa com os dois traçados sobrepostos, quase idênticos',
+    legend:[['Você','8,42 km'],['Rafa','8,19 km']],
+    title:'Lado a lado', verdict:'+0,23 km',
+    you:'5:12 /km', them:'7ª série seguida',
+    when:'Hoje · 19:04 → 20:11 · Parque Ibirapuera',
+    rows:[
+      ['Distância','8,42','km','8,19','km',1],
+      ['Tempo','44:07','','42:55','',2],
+      ['Pace médio','5:12','/km','5:14','/km',1],
+      ['Ritmo máx.','4:31','/km','4:48','/km',1],
+      ['Cadência','178','spm','171','spm',1],
+      ['Desnível','+64','m','+71','m',2]
+    ],
+    prs:[['Melhor pace médio do duo','Rafa puxou · 14 de out','5:04/km'],
+         ['Distância somada no mês','Vocês dois · outubro','142 km'],
+         ['Treinos no mesmo dia','Sequência atual','6 dias']],
+    xp:'+320 XP', streak:6,
+    note:'Vocês são o duo mais consistente do Parque Ibirapuera em outubro. A próxima é quarta, 19h.',
+    gamCta:'Ver a série de outubro',
+    cta:'Convidar para quarta, 19h',
+    ctaSub:'Rafa recebe o trajeto e o horário sugerido'
+  },
+
+  gym: {
+    map:'floor', mapAria:'Planta aproximada da academia com a zona de cada um',
+    legend:[['Você','8.640 kg'],['Rafa','5.460 kg']],
+    title:'Carga e esforço', verdict:'+3.180 kg',
+    you:'8.640 kg movidos', them:'Supino inclinado',
+    when:'Hoje · 18:30 → 19:48 · Studio Norte',
+    rows:[
+      ['Volume total','8.640','kg','5.460','kg',1],
+      ['Séries concluídas','22','','18','',1],
+      ['Repetições','214','','167','',1],
+      ['Carga máxima','92,5','kg','80','kg',1],
+      ['Tempo de descanso','17','min','23','min',1]
+    ],
+    ex:[
+      ['Supino inclinado',26,14,'4×10 · 65 kg'],
+      ['Agachamento livre',22,16,'4×8 · 80 kg'],
+      ['Remada baixa',18,12,'4×12 · 55 kg'],
+      ['Desenvolvimento',14,11,'3×12 · 30 kg']
+    ],
+    prs:[['Volume somado no mês','Vocês dois · outubro','18.420 kg'],
+         ['Carga máxima do duo','Você · hoje','92,5 kg'],
+         ['Treinos no mesmo dia','Sequência atual','6 dias']],
+    xp:'+280 XP', streak:6,
+    note:'Vocês treinaram juntos 6 vezes no Studio Norte e somaram 18.420 kg em outubro.',
+    gamCta:'Ver os 6 treino juntos',
+    cta:'Convidar para quinta, 18:30',
+    ctaSub:'Rafa recebe a sugestão de treino'
+  },
+
+  cal: {
+    map:'park', mapAria:'Trajeto no parque com os pontos de cada um',
+    legend:[['Você','412 reps'],['Rafa','172 reps']],
+    title:'Repetições e seguradas', verdict:'+240 reps',
+    you:'Barra fixa · 34 reps', them:'Sequência 4 do mês',
+    when:'Hoje · 07:10 → 07:52 · Praça do Ibirapuera',
+    rows:[
+      ['Repetições totais','412','','172','',1],
+      ['Melhor sequência','34','','12','',1],
+      ['Tempo total','41:52','','22:14','',1],
+      ['Movimentos distintos','9','','6','',1],
+      ['Tempo de segurada','68','s','31','s',1]
+    ],
+    reps:[
+      ['Repetições','412','172',1],
+      ['Movimentos','9','6',1],
+      ['Seguradas','9','5',.68],
+      ['Tempo','41:52','22:14',1]
+    ],
+    prs:[['Nível de Frontlever','Vocês dois · este mês','Nv. 4'],
+         ['Repetições somadas no mês','Vocês dois · outubro','4.180'],
+         ['Treinos no mesmo dia','Sequência atual','6 dias']],
+    xp:'+260 XP', streak:6,
+    note:'Vocês subiram 4 níveis de Frontlever juntos este mês. Subir junto é mais rápido.',
+    gamCta:'Ver as skills do duo',
+    cta:'Convidar para sábado, 7h',
+    ctaSub:'Rafa recebe o ponto sugerido no parque'
+  },
+
+  ride: {
+    map:'route', mapAria:'Mapa com os dois traçados e a faixa de elevação',
+    legend:[['Você','41,6 km'],['Rafa','38,2 km']],
+    title:'Potência e ritmo', verdict:'+41 W',
+    you:'198 W médios', them:'62 km',
+    when:'Hoje · 06:20 → 07:35 · Marginal Pinheiros',
+    rows:[
+      ['Distância','41,6','km','38,2','km',1],
+      ['Tempo','1:14:52','','1:19:30','',1],
+      ['Velocidade máx.','44,2','km/h','41,8','km/h',1],
+      ['Potência média','198','W','157','W',1],
+      ['Desnível','+412','m','+498','m',2]
+    ],
+    prs:[['Potência somada no mês','Vocês dois · outubro','2.840 W'],
+         ['Subida mais rápida do duo','Você · 21 de out','11:40'],
+         ['Treinos no mesmo dia','Sequência atual','6 dias']],
+    xp:'+340 XP', streak:6,
+    note:'Vocês subiram a Marginal juntos 6 vezes. A próxima subida é sábado, 7h.',
+    gamCta:'Ver as subidas do duo',
+    cta:'Convidar para sábado, 7h',
+    ctaSub:'Rafa recebe o ponto de encontro'
+  }
+};
+
+/* ══ Mapa: 3 linguagens, 1 sistema ══ */
+const ROUTE = {
+  run: {a:'M52 392 C86 364 112 356 140 322 C166 290 158 254 184 232 C210 210 238 212 256 186 C274 160 266 126 288 100',
+        b:'M52 392 C74 356 108 340 132 306 C152 278 146 240 172 216 C198 192 226 196 246 168 C264 142 258 108 282 84',
+        elev:true},
+  ride:{a:'M44 400 C96 366 118 372 150 330 C180 290 168 252 198 226 C228 200 252 206 268 176 C282 150 276 118 300 88',
+        b:'M44 400 C78 358 110 348 138 304 C164 264 154 228 184 202 C212 178 238 182 256 156 C272 132 266 104 290 76',
+        elev:true}
+};
+
+function drawMap(k){
+  const s = SPORTS[k], svg = document.querySelector('[data-svg]');
+  const grid = `<g stroke="#e4e1d8" stroke-width="1">
+      <path d="M-20 60h380M-20 150h380M-20 240h380M-20 330h380M-20 415h380" fill="none"/>
+      <path d="M55 -20v460M145 -20v460M235 -20v460M315 -20v460" fill="none"/></g>
+    <path d="M0 380 Q90 350 150 300 T340 210" stroke="#dfe7dd" stroke-width="26" fill="none" stroke-linecap="round"/>
+    <path d="M250 -20 Q262 90 240 170 T265 445" stroke="#dfe7dd" stroke-width="20" fill="none" stroke-linecap="round"/>`;
+
+  let layers = '';
+  if(s.map === 'route'){
+    const r = ROUTE[k];
+    layers = `<g id="lay-a" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="${r.a}" stroke="#f58220" stroke-width="9" opacity=".20"/>
+        <path d="${r.a}" stroke="#f58220" stroke-width="3.4"/>
+      </g>
+      <g id="lay-b" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="${r.b}" stroke="#003399" stroke-width="9" opacity=".20"/>
+        <path d="${r.b}" stroke="#003399" stroke-width="3.4"/>
+      </g>
+      ${r.elev?`<g id="lay-elev" transform="translate(0,332)">
+        <path d="M0 30 L40 24 L80 28 L120 12 L160 18 L200 6 L240 14 L280 2 L340 10 L340 44 L0 44 Z"
+              fill="rgba(12,10,9,.07)"/>
+        <path d="M0 30 L40 24 L80 28 L120 12 L160 18 L200 6 L240 14 L280 2 L340 10"
+              fill="none" stroke="rgba(12,10,9,.30)" stroke-width="1.6"/>
+        <text x="6" y="11" font-size="9" font-weight="800" fill="#57534e" letter-spacing=".08em">ELEVAÇÃO</text>
+      </g>`:''}
+      <circle cx="52" cy="392" r="7.5" fill="#fff" stroke="#0c0a09" stroke-width="3"/>
+      <circle cx="284" cy="92" r="7.5" fill="#fff" stroke="#0c0a09" stroke-width="3"/>
+      <circle cx="288" cy="100" r="6" fill="#f58220"/>
+      <circle cx="282" cy="84" r="6" fill="#003399"/>`;
+  }
+  if(s.map === 'floor'){
+    // planta aproximada — Move promete nunca mostrar a posição exata
+    layers = `<g stroke="#dedbd3" stroke-width="1.4" fill="#ebe9e3">
+        <rect x="18" y="26" width="304" height="118" rx="7"/>
+        <rect x="18" y="164" width="118" height="106" rx="7"/>
+        <rect x="156" y="164" width="166" height="106" rx="7"/>
+        <rect x="18" y="290" width="304" height="96" rx="7"/></g>
+      <g font-size="8.5" font-weight="800" fill="#6b6a68" letter-spacing=".08em">
+        <text x="28" y="44">HALTERES</text><text x="28" y="182">CARDIO</text>
+        <text x="166" y="182">MULTIFUNCIONAL</text><text x="28" y="308">BANCOS · SUPINO</text></g>
+      <g id="lay-a"><ellipse cx="96" cy="326" rx="34" ry="26" fill="#f58220" opacity=".22"/>
+        <ellipse cx="96" cy="326" rx="17" ry="13" fill="#f58220"/></g>
+      <g id="lay-b"><ellipse cx="252" cy="214" rx="32" ry="24" fill="#003399" opacity=".22"/>
+        <ellipse cx="252" cy="214" rx="16" ry="12" fill="#003399"/></g>
+      <text x="96" y="368" text-anchor="middle" font-size="9" font-weight="800" fill="#8a3f08">VOCÊ · 26 min</text>
+      <text x="252" y="256" text-anchor="middle" font-size="9" font-weight="800" fill="#003399">RAFA · 14 min</text>
+      <text x="170" y="404" text-anchor="middle" font-size="9" font-weight="700" fill="#6b6a68">Zonas aproximadas</text>`;
+  }
+  if(s.map === 'park'){
+    layers = `<path d="M40 388 C96 356 140 362 186 320 C226 284 220 236 258 200 C284 176 286 142 300 112"
+        fill="none" stroke="#dedbd3" stroke-width="13" stroke-linecap="round" stroke-dasharray="1 9"/>
+      <g fill="#e4e1d8">
+        <circle cx="70" cy="330" r="20"/><circle cx="230" cy="150" r="24"/><circle cx="140" cy="250" r="16"/></g>
+      <g id="lay-a"><circle cx="72" cy="330" r="24" fill="#f58220" opacity=".22"/>
+        <circle cx="72" cy="330" r="11" fill="#f58220"/></g>
+      <g id="lay-b"><circle cx="232" cy="152" r="24" fill="#003399" opacity=".22"/>
+        <circle cx="232" cy="152" r="11" fill="#003399"/></g>
+      <g font-size="8.5" font-weight="800" fill="#6b6a68" letter-spacing=".06em">
+        <text x="46" y="300">BARRA FIXA</text><text x="206" y="118">BARRAS · SOLO</text></g>`;
+  }
+  svg.innerHTML = grid + layers;
+  document.querySelector('[data-map]').setAttribute('aria-label', s.mapAria);
+}
+
+/* ══ Divisor de comparação (clip-path, sem transition — é drag) ══ */
+const range = document.querySelector('[data-range]');
+range.addEventListener('input', () => {
+  const v = range.value + '%';
+  document.querySelector('[data-div]').style.setProperty('--x', v);
+  const la = document.getElementById('lay-a'), lb = document.getElementById('lay-b');
+  if(la && lb){ la.style.clipPath = `inset(0 ${100-range.value}% 0 0)`; lb.style.clipPath = `inset(0 0 0 ${range.value}%)`; }
+});
+document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+  const div = document.querySelector('[data-div]');
+  div.hidden = b.dataset.mode !== 'split';
+  if(b.dataset.mode === 'over'){
+    document.querySelectorAll('#lay-a,#lay-b').forEach(l => l.style.clipPath = '');
+  }
+}));
+
+/* ══ Blocos ══ */
+const num = s => parseFloat(s.replace(/\./g,'').replace(',','.')) || 0;
+const WIN = {1:['a','Você na frente'], 2:['b','Rafa na frente'], 0:['tie','empate']};
+
+function metrics(s){
+  document.querySelector('[data-rows]').innerHTML = s.rows.map(([lab,av,au,bv,bu,w],i) => {
+    const [cls,txt] = WIN[w];
+    const mx = Math.max(num(av), num(bv)) || 1;
+    return `<div class="mrow" style="transition-delay:${i*40}ms">
+      <div class="mtop">
+        <div>
+          <div class="t-lab">${lab}</div>
+          <div class="mval">
+            <b class="t-num" style="color:var(--brand-deep)">${av}</b><span class="u">${au}</span>
+            <span class="slash">/</span>
+            <b class="t-num" style="color:var(--duo)">${bv}</b><span class="u">${bu}</span>
+          </div>
+        </div>
+        <span class="win ${cls}">${txt}</span>
+      </div>
+      <div class="bars">
+        <div class="track"><div class="fill a" data-w="${num(av)/mx*100}"></div></div>
+        <div class="track"><div class="fill b" data-w="${num(bv)/mx*100}"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exercises(s){
+  const w = document.querySelector('[data-ex-wrap]');
+  w.hidden = !s.ex; if(!s.ex) return;
+  const mx = Math.max(...s.ex.map(e => e[1]+e[2]));
+  document.querySelector('[data-ex]').innerHTML = s.ex.map(([n,a,b,note],i) => `
+    <div class="ex" style="transition-delay:${i*40}ms">
+      <div class="ex-h"><b>${n}</b><span>${note}</span></div>
+      <div class="split">
+        <i class="a" data-w="${a/mx*100}"></i><i class="b" data-w="${b/mx*100}"></i>
+      </div>
+      <div class="splitn"><span class="a">${a} min</span><span class="b">${b} min</span></div>
+    </div>`).join('');
+}
+
+function reps(s){
+  const w = document.querySelector('[data-rep-wrap]');
+  w.hidden = !s.reps; if(!s.reps) return;
+  document.querySelector('[data-reps]').innerHTML = s.reps.map(([n,a,b,r],i) => `
+    <div class="rep" style="transition-delay:${i*30}ms">
+      <span class="t-lab">${n}</span>
+      <b><span class="a">${a}</span> <span class="slash">/</span> <span class="b">${b}</span></b>
+      <div class="hold"><i class="a" data-w="${r*100}"></i></div>
+    </div>`).join('');
+}
+
+function prs(s){
+  const el = document.querySelector('[data-prs]');
+  if (!el || !s.prs) return;
+  el.innerHTML = s.prs.map(([t,sub,v]) => `
+    <div class="pr">
+      <div class="pr-ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a8560c"
+             stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>
+        </svg>
+      </div>
+      <div class="pr-t"><b>${t}</b><small>${sub}</small></div>
+      <span class="pr-d">${v}</span>
+    </div>`).join('');
+}
+
+const C = {
+  title: '[data-metric-title]', verdict:'[data-verdict]', you:'[data-you-sub]',
+  them:'[data-them-sub]', when:'[data-when]', xp:'[data-xp]', streak:'[data-streak]',
+  note:'[data-gam-note]', gamCta:'[data-gam-cta]', cta:'[data-cta]', ctaSub:'[data-cta-sub]',
+  ctl:'[data-ctl]', div:'[data-div]', legend:'[data-legend]'
+};
+
+function apply(k){
+  const s = SPORTS[k];
+  drawMap(k);
+
+  Object.entries({title:s.title, verdict:s.verdict, you:s.you, them:s.them, when:s.when,
+                  xp:s.xp, streak:s.streak, note:s.note, gamCta:s.gamCta,
+                  cta:s.cta, ctaSub:s.ctaSub}).forEach(([key,val]) => {
+    const el = document.querySelector(C[key]); if(el) el.textContent = val;
+  });
+
+  metrics(s); exercises(s); reps(s); prs(s);
+  const lg = document.querySelector('[data-legend]');
+  if (lg) lg.innerHTML = s.legend.map(([n,v]) =>
+    `<div><i class="dot ${n==='Você'?'a':'b'}"></i>${n} — ${v}</div>`).join('');
+
+  // mapa só oferece divisor/sobreposição quando as duas camadas fazem sentido
+  const A = document.getElementById('lay-a'), B = document.getElementById('lay-b');
+  const splitOK = s.map === 'route' && A && B;
+  document.querySelector(C.ctl).hidden = !splitOK;
+  document.querySelector(C.div).hidden = !splitOK;
+  document.querySelector('[data-mode="split"]').setAttribute('aria-pressed','true');
+  document.querySelector('[data-mode="over"]').setAttribute('aria-pressed','false');
+  if(splitOK) range.dispatchEvent(new Event('input'));
+
+  // Emil: blur na crossfade — a troca de conteúdo é grande, sem isso fica áspero
+  ['[data-metrics]','[data-ex-wrap]','[data-rep-wrap]'].forEach(sel => {
+    const el = document.querySelector(sel);
+    el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
+  });
+
+  // bars: transform só, e só nos painéis visíveis — um painel oculto
+  // mantém o data-w do esporte anterior e anima para o vazio
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const live = [...document.querySelectorAll('[data-w]')].filter(b => b.offsetParent !== null);
+    live.forEach((el,i) => {
+      el.style.transitionDelay = Math.min(i*32, 320) + 'ms';
+      el.style.transform = `scaleX(${parseFloat(el.dataset.w)/100})`;
+    });
+  }));
+}
+
+/* ══ Tabs ══ */
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-selected','false'));
+  b.setAttribute('aria-selected','true');
+  apply(b.dataset.s);
+}));
+
+/* ══ Coluna direita no desktop: move, não clona ══ */
+const col = document.querySelector('[data-colr]'), colL = document.querySelector('.col-l');
+const say = document.querySelector('.say');
+let t;
+function relayout(){
+  clearTimeout(t);
+  t = setTimeout(() => {
+    const wide = matchMedia('(min-width:1000px)').matches;
+    const pr = document.querySelector('[data-prs-wrap]');
+    const gam = document.querySelector('.gam');
+    if (wide) { col.append(gam, pr); }
+    else { say.before(gam); say.before(pr); }   // no mobile, antes do comentário/CTA
+    gam.hidden = pr.hidden = false;
+  }, 120);
+}
+relayout(); addEventListener('resize', relayout);
+
+/* ══ Estados ══ */
+const cmt = document.querySelector('[data-cmt]'), send = document.querySelector('[data-send]');
+cmt.addEventListener('input', () => send.disabled = !cmt.value.trim());
+document.querySelector('[data-say]').addEventListener('submit', e => {
+  e.preventDefault(); if(!cmt.value.trim()) return;
+  send.textContent = 'Enviado'; send.disabled = false; cmt.value = '';
+  setTimeout(() => { send.textContent = 'Enviar'; send.disabled = true; }, 1400);
+});
+/* restaura o rótulo atual, não o do HTML — o CTA muda por esporte */
+const done = el => {
+  const back = el.textContent;
+  el.textContent = 'Pronto'; el.disabled = true;
+  setTimeout(() => { el.disabled = false; el.textContent = back; }, 1600);
+};
+document.querySelectorAll('.ctax').forEach(b => b.addEventListener('click', e => done(e.currentTarget)));
+
+/* stagger de entrada, curto e não bloqueante */
+document.querySelectorAll('.duo,.panel,.say,.cta').forEach((el,i) => {
+  el.classList.add('rise'); el.style.animationDelay = 60 + i*50 + 'ms';
+});
+
+apply('run');
+</script>
+</body>
+</html>

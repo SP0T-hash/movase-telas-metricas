@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Movase — Treino em conjunto (com trajeto)</title>
+
+<link href="https://unpkg.com/maplibre-gl@5.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@5.7.1/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/@turf/turf@7.1.0/turf.min.js"></script>
+
+<style>
+/* Tokens nativos Movase */
+:root{
+  color-scheme:light;
+  --accent:#F58220; --accent-on:#0A0A0A;
+  --bg:#FFFFFF; --fg:#0A0A0A; --fg-2:#57534E; --meta:#57534E;
+  --muted:#F5F5F4; --surface:#F5F5F4; --surface-warm:#FFF4E8;
+  --border:#E7E5E4; --place-blue:#003399;
+  --accent-text:#8A3F08;
+  --r-sm:8px; --r-md:20px; --r-pill:9999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;
+  --t-xs:11.5px;--t-sm:13px;--t-base:15px;--t-lg:19px;--t-xl:25px;--t-2xl:40px;
+  --sans:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+@media (prefers-color-scheme:dark){
+  :root{color-scheme:dark;
+    --bg:#0C0A09;--fg:#FAFAF9;--fg-2:#A8A29E;--meta:#A8A29E;
+    --muted:#1C1917;--surface:#1C1917;--surface-warm:#2A1A0C;
+    --border:#292524;--place-blue:#7DA7FF;--accent-text:#F58220;
+  }
+}
+:root[data-theme=dark]{color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--muted);color:var(--fg);font:400 var(--t-base)/1.5 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.phone{max-width:430px;margin:0 auto;background:var(--bg);min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto}
+@media (min-width:480px){.phone{margin:24px auto;border-radius:var(--r-md);overflow:clip;min-height:calc(100dvh - 48px)}}
+.bar{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-bottom:1px solid var(--border);background:var(--bg);z-index:5}
+.bar h1{font-size:var(--t-xl);font-weight:800;flex:1;margin:0;letter-spacing:-.015em}
+.ib{width:40px;height:40px;border-radius:var(--r-pill);display:grid;place-items:center;transition:transform 140ms var(--ease)}
+.ib:active{transform:scale(.94)}
+.ib svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.scroll{overflow-y:auto;overscroll-behavior:contain;padding:var(--s4) var(--s4) var(--s8)}
+.screen{display:none}
+.screen[data-on]{display:block}
+h2{font-size:var(--t-lg);font-weight:800;margin:0 0 var(--s2);letter-spacing:-.015em}
+h3{font-size:var(--t-base);font-weight:800;margin:0}
+.measure{font-size:var(--t-sm);color:var(--meta);margin:0 0 var(--s4)}
+.seg{display:flex;gap:2px;padding:3px;background:var(--muted);border-radius:var(--r-pill);overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);font-size:var(--t-base);font-weight:700;color:var(--meta)}
+.seg button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.surface{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip;margin:var(--s4) 0}
+.row{display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);text-align:left;transition:background-color 140ms var(--ease)}
+.row+.row{border-top:1px solid var(--border)}
+.row:active{transform:scale(.995)}
+.av{width:44px;height:44px;border-radius:var(--r-pill);display:grid;place-items:center;font-weight:800;color:#fff;letter-spacing:.02em}
+.av.a{background:var(--accent);color:var(--accent-on)}
+.av.b{background:var(--place-blue);color:#0A0A0A}
+.name{font-weight:700}
+.meta{font-size:var(--t-sm);color:var(--meta)}
+.tag{display:inline-flex;padding:3px 9px;border-radius:var(--r-pill);background:var(--surface-warm);color:var(--accent-text);font-size:var(--t-xs);font-weight:800;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s5);border-radius:var(--r-pill);font-weight:800;background:var(--accent);color:var(--accent-on);width:100%;transition:transform 140ms var(--ease),opacity 140ms var(--ease)}
+.btn:active{transform:scale(.985)}
+.btn.ghost{background:var(--muted);color:var(--fg)}
+.btn.warn{background:color-mix(in oklab,var(--fg) 8%,var(--surface))}
+.tabs{display:grid;grid-auto-flow:column;border-top:1px solid var(--border);background:var(--bg)}
+.tabs button{min-height:52px;font-size:var(--t-base);font-weight:700;color:var(--fg-2);display:grid;justify-items:center;gap:2px;padding:6px 2px}
+.tabs button[aria-current=page]{color:var(--accent)}
+.big{font-size:var(--t-2xl);font-weight:800;letter-spacing:-.025em;line-height:1.05}
+.k{font-size:var(--t-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--meta);font-weight:800}
+.split{display:grid;grid-template-columns:1fr 1px 1fr;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip;margin:var(--s4) 0}
+.col{padding:var(--s4)}
+.rail{position:relative;background:var(--border)}
+.vs{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:var(--r-pill);background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:var(--t-xs);font-weight:800;color:var(--fg-2);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.map-wrap{position:relative;border:1px solid var(--border);border-radius:var(--r-md);overflow:clip;margin:var(--s4) 0;aspect-ratio:4/5;background:var(--muted)}
+#map,#mapFinal{position:absolute;inset:0}
+.map-top{position:absolute;left:var(--s3);right:var(--s3);top:var(--s3);display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:2}
+.chip{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--r-pill);background:color-mix(in oklab,var(--bg) 92%,transparent);backdrop-filter:blur(10px) saturate(1.6);-webkit-backdrop-filter:blur(10px) saturate(1.6);border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.map-bottom{position:absolute;left:var(--s3);right:var(--s3);bottom:max(var(--s3),env(safe-area-inset-bottom));display:grid;gap:var(--s2);z-index:2}
+.stats{background:color-mix(in oklab,var(--bg) 94%,transparent);backdrop-filter:blur(12px) saturate(1.6);-webkit-backdrop-filter:blur(12px) saturate(1.6);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--s3) var(--s4);display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3)}
+.stat{text-align:center}
+.stat .v{font-size:var(--t-lg);font-weight:800;letter-spacing:-.02em}
+.stat .k{margin-top:2px}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s2)}
+.empty{display:grid;justify-items:center;gap:var(--s3);padding:var(--s8) var(--s4);text-align:center}
+.empty p{font-size:var(--t-sm);color:var(--meta);max-width:34ch}
+.hlist{display:grid;gap:var(--s3);margin-top:var(--s3)}
+.hcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip}
+.hcard .mapmini{aspect-ratio:16/9;background:var(--muted);position:relative}
+.hcard .body{padding:var(--s3) var(--s4);display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s3)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition-duration:1ms!important}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header class="bar">
+    <button class="ib" id="back" aria-label="Voltar" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h1 id="title">Mapa</h1>
+    <button class="ib" id="theme" aria-label="Alternar tema"><svg id="theme-ico" viewBox="0 0 24 24"></svg></button>
+  </header>
+
+  <main class="scroll" id="main">
+    <!-- MAPA/CONVITE -->
+    <section class="screen" data-s="mapa" data-on>
+      <h2>Chamar pra treinar</h2>
+      <p class="measure">Convide alguém com quem já deu match. O trajeto é traçado em tempo real quando iniciarem juntos.</p>
+      <div class="seg" id="modSeg" role="group" aria-label="Modalidade">
+        <button aria-pressed="true" data-mod="Corrida">Corrida</button>
+        <button aria-pressed="false" data-mod="Musculação">Musculação</button>
+        <button aria-pressed="false" data-mod="Calistenia">Calistenia</button>
+        <button aria-pressed="false" data-mod="Ciclismo">Ciclismo</button>
+      </div>
+      <h3 style="margin:var(--s5) 0 var(--s2);font-size:var(--t-base);font-weight:800">Matches</h3>
+      <div class="surface">
+        <button class="row" data-goto="chat" data-partner="Rafa Alencar" data-init="RA">
+          <span class="av a">RA</span>
+          <span><div class="name">Rafa Alencar</div><div class="meta">Calistenia • frequências parecidas</div></span>
+          <span class="tag">Chamar</span>
+        </button>
+        <button class="row" data-goto="chat" data-partner="Júlia Okafor" data-init="JO">
+          <span class="av b">JO</span>
+          <span><div class="name">Júlia Okafor</div><div class="meta">Corrida • treina 3x/sem</div></span>
+          <span class="tag">Chamar</span>
+        </button>
+        <button class="row" data-goto="chat" data-partner="Beto Tavares" data-init="BT">
+          <span class="av b">BT</span>
+          <span><div class="name">Beto Tavares</div><div class="meta">Ciclismo • parceiro Movase</div></span>
+          <span class="tag">Chamar</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section class="screen" data-s="chat">
+      <h2>Chat</h2>
+      <div class="surface">
+        <div class="row">
+          <span class="av a" id="chatAv">RA</span>
+          <span><div class="name" id="chatName">Rafa Alencar</div><div class="meta">Convite aceito • <span id="chatMod">Corrida</span></div></span>
+          <span class="tag" id="chatTag">Juntos</span>
+        </div>
+        <div style="padding:var(--s3) var(--s4);border-top:1px solid var(--border)">
+          <p class="meta" style="margin:0">“Bora treinar junto hoje.”</p>
+        </div>
+      </div>
+      <button class="btn" id="btnStart">Iniciar treino junto</button>
+      <button class="btn ghost" style="margin-top:var(--s2)" data-goto="mapa">Voltar</button>
+    </section>
+
+    <!-- ANDAMENTO -->
+    <section class="screen" data-s="andamento">
+      <h2>Treino em andamento • <span id="runMod">Corrida</span></h2>
+      <div class="map-wrap">
+        <div id="map"></div>
+        <div class="map-top">
+          <div class="chip"><span class="k">Status</span> <span id="status">Pronto</span></div>
+          <div class="chip"><span class="k">Precisão</span> <span id="acc">— m</span></div>
+        </div>
+        <div class="map-bottom">
+          <div class="stats">
+            <div class="stat"><div class="v" id="kmLive">0,00</div><div class="k">km</div></div>
+            <div class="stat"><div class="v" id="timeLive">00:00:00</div><div class="k">tempo</div></div>
+            <div class="stat"><div class="v" id="paceLive">--'--</div><div class="k">pace /km</div></div>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" id="btnPause">Pausar</button>
+            <button class="btn" id="btnStop">Finalizar</button>
+          </div>
+        </div>
+      </div>
+      <p class="meta">O trajeto é traçado ao vivo. A localização segue você enquanto corre/cicla.</p>
+    </section>
+
+    <!-- FINALIZAR -->
+    <section class="screen" data-s="finalizar">
+      <h2>Treino finalizado</h2>
+      <p class="measure">Percurso registrado em conjunto. Pode salvar no histórico do perfil.</p>
+      <div class="map-wrap">
+        <div id="mapFinal"></div>
+      </div>
+      <div class="split">
+        <div class="col">
+          <div style="display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)">
+            <span class="av a">VC</span><span class="name">Você</span>
+          </div>
+          <div class="m"><div class="k">Distância</div><div style="font-size:var(--t-xl);font-weight:800;letter-spacing:-.02em;line-height:1.05" id="fKmYou">0,00 km</div></div>
+          <div class="m"><div class="k">Tempo</div><div style="font-weight:700" id="fTimeYou">00:00:00</div></div>
+          <div class="m"><div class="k">Pace</div><div style="font-weight:700" id="fPaceYou">--'-- /km</div></div>
+          <div class="m"><div class="k">Velocidade média</div><div style="font-weight:700" id="fSpdYou">0,0 km/h</div></div>
+        </div>
+        <div class="rail"><div class="vs">VS</div></div>
+        <div class="col">
+          <div style="display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)">
+            <span class="av b" id="fAvB">RA</span><span class="name" id="fNameB">Rafa</span>
+          </div>
+          <div class="m"><div class="k">Distância</div><div style="font-size:var(--t-xl);font-weight:800;letter-spacing:-.02em;line-height:1.05" id="fKmB">0,00 km</div></div>
+          <div class="m"><div class="k">Tempo</div><div style="font-weight:700" id="fTimeB">00:00:00</div></div>
+          <div class="m"><div class="k">Pace</div><div style="font-weight:700" id="fPaceB">--'-- /km</div></div>
+          <div class="m"><div class="k">Velocidade média</div><div style="font-weight:700" id="fSpdB">0,0 km/h</div></div>
+        </div>
+      </div>
+      <div class="surface">
+        <div class="line" style="display:flex;justify-content:space-between;align-items:center;padding:var(--s3) var(--s4)">
+          <span class="k">Percurso em conjunto</span><span class="meta" id="fRoute">Mesmo trajeto • 0,00 km</span>
+        </div>
+      </div>
+      <button class="btn" id="btnSaveHist">Salvar no histórico</button>
+      <button class="btn ghost" style="margin-top:var(--s2)" data-goto="mapa">Descartar</button>
+    </section>
+
+    <!-- PERFIL -->
+    <section class="screen" data-s="perfil">
+      <h2>Perfil</h2>
+      <div class="surface">
+        <div class="row">
+          <span class="av a">VC</span>
+          <span><div class="name">Você</div><div class="meta">Movase • <span id="histCount">0</span> treinos</div></span>
+        </div>
+      </div>
+      <div class="seg" style="margin-top:var(--s4)">
+        <button aria-pressed="true">Histórico</button>
+        <button aria-pressed="false">Stats</button>
+        <button aria-pressed="false">Amigos</button>
+      </div>
+      <h3 style="margin:var(--s5) 0 var(--s2)">Treinos em conjunto</h3>
+      <div id="histList" class="hlist"></div>
+      <div id="histEmpty" class="empty">
+        <svg viewBox="0 0 24 24" width="40" height="40" stroke="var(--fg-2)" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5L9 17l12-12"/></svg>
+        <h3>Nenhum treino salvo ainda</h3>
+        <p>Finalize um treino em conjunto pra ele aparecer aqui no seu histórico.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-t="mapa" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Mapa</button>
+    <button data-t="chat"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat</button>
+    <button data-t="andamento"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Treino</button>
+    <button data-t="perfil"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9.5" cy="7" r="3.5"/></svg>Perfil</button>
+  </nav>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const TIT={mapa:'Mapa',chat:'Chat',andamento:'Treino em andamento',finalizar:'Finalizar treino',perfil:'Perfil'};
+
+let on='mapa',stack=[],mod='Corrida',partner='Rafa Alencar',pInit='RA';
+
+const mapLive = new maplibregl.Map({container:'map',style:'https://demotiles.maplibre.org/style.json',center:[-46.633,-23.55],zoom:15,attributionControl:false,logoPosition:'bottom-right'});
+mapLive.addControl(new maplibregl.NavigationControl({showCompass:false}), 'top-left');
+mapLive.addControl(new maplibregl.GeolocateControl({positionOptions:{enableHighAccuracy:true},trackUserLocation:true,showUserHeading:true}), 'top-left');
+
+const mapFin = new maplibregl.Map({container:'mapFinal',style:'https://demotiles.maplibre.org/style.json',center:[-46.633,-23.55],zoom:14,attributionControl:false});
+let userLine=null,routeGeo=null,watchId=null,startedAt=0,elapsed=0,running=false,paused=false,distM=0,last=null,coords=[];
+
+function fmtTime(s){s=Math.max(0,Math.floor(s));const h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor(s/60)%60).padStart(2,'0'),sec=String(s%60).padStart(2,'0');return h+':'+m+':'+sec}
+function fmtKm(m){return (m/1000).toFixed(2)}
+function paceMinPerKm(m,s){if(m<1||s<1)return "--'--";const minKm=s/60/(m/1000);const mm=Math.floor(minKm),ss=Math.round((minKm-mm)*60)%60;return `${mm}'${String(ss).padStart(2,'0')}`}
+function kmh(m,s){if(s<1)return '0,0';return ((m/1000)/(s/3600)).toFixed(1).replace('.',',')}
+function hav(m1,m2){const R=6371000,a=((m2.lat-m1.lat)*Math.PI/180),b=((m2.lng-m1.lng)*Math.PI/180),dLat=a,dLng=b,la1=m1.lat*Math.PI/180,la2=m2.lat*Math.PI/180;const h=Math.sin(dLat/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function go(n){if(n!==on&&n!=='andamento')stack.push(on);on=n;$$('.screen').forEach(s=>s.toggleAttribute('data-on',s.dataset.s===on));$('#title').textContent=TIT[on];$$('.tabs button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.t===on));$('#back').hidden=!stack.length}
+$$('.tabs button').forEach(b=>b.addEventListener('click',()=>{const t=b.dataset.t;if(t==='andamento'&&!startedAt){go('mapa');return}go(t)}))
+document.addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if(g){const p=g.dataset.partner,pi=g.dataset.init;if(p){partner=p;pInit=pi;$('#chatName').textContent=p;$('#chatAv').textContent=pi;$('#fNameB').textContent=p.split(' ')[0];$('#fAvB').textContent=pi}go(g.dataset.goto)}})
+$('#back').addEventListener('click',()=>{if(stack.length)go(stack.pop())})
+$$('#modSeg button').forEach(b=>b.addEventListener('click',()=>{$$('#modSeg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));mod=b.dataset.mod;$('#chatMod').textContent=mod;$('#runMod').textContent=mod}))
+const SUN='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>';const MOON='<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>';
+function paint(){const d=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');$('#theme-ico').innerHTML=d==='dark'?SUN:MOON}
+$('#theme').addEventListener('click',()=>{const c=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=c==='dark'?'light':'dark';try{localStorage.setItem('movase-theme',document.documentElement.dataset.theme)}catch{}paint()});matchMedia('(prefers-color-scheme:dark)').addEventListener('change',paint);try{const s=localStorage.getItem('movase-theme');if(s)document.documentElement.dataset.theme=s}catch{}paint()
+
+function tick(){if(!running||paused)return;elapsed=Math.floor((Date.now()-startedAt)/1000);$('#timeLive').textContent=fmtTime(elapsed);$('#kmLive').textContent=fmtKm(distM);$('#paceLive').textContent=paceMinPerKm(distM,elapsed)}
+setInterval(tick,1000)
+
+mapLive.on('load',()=>{
+  mapLive.addSource('route',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:[]}}})
+  mapLive.addLayer({id:'route',type:'line',source:'route',paint:{'line-color':getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#F58220','line-width':5,'line-opacity':.95}})
+  mapLive.addSource('loc',{type:'geojson',data:{type:'Feature',geometry:{type:'Point',coordinates:[-46.633,-23.55]}}})
+  mapLive.addLayer({id:'loc',type:'circle',source:'loc',paint:{'circle-radius':8,'circle-color':getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#F58220','circle-stroke-width':3,'circle-stroke-color':'#fff'}})
+})
+
+function updateRoute(){if(!coords.length)return;const geo={type:'LineString',coordinates:coords};routeGeo=geo;if(mapLive.getSource('route'))mapLive.getSource('route').setData({type:'Feature',geometry:geo});if(mapFin.loaded()){mapFin.getSource('routeF')?.setData({type:'Feature',geometry:geo})}}
+function centerOn(p){if(mapLive.getZoom()<14)mapLive.setZoom(16);mapLive.easeTo({center:p,pitch:0,bearing:0,duration:400})}
+
+$('#btnStart').addEventListener('click',()=>{
+  coords=[];distM=0;elapsed=0;last=null;running=true;paused=false;startedAt=Date.now();
+  if(watchId)navigator.geolocation.clearWatch(watchId);
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    const c=[pos.coords.longitude,pos.coords.latitude],p={lat:pos.coords.latitude,lng:pos.coords.longitude},acc=Math.round(pos.coords.accuracy);
+    $('#acc').textContent=acc+' m';$('#status').textContent=paused?'Pausado':'Rastreando';
+    if(mapLive.getSource('loc'))mapLive.getSource('loc').setData({type:'Feature',geometry:{type:'Point',coordinates:c}});
+    centerOn(c);
+    if(running&&!paused){
+      if(last){const d=hav(last,p);if(d>2&&d<80){distM+=d;coords.push(c);updateRoute()}}
+      else{coords.push(c);updateRoute()}
+      last=p;
+    }
+  },err=>{$('#status').textContent='Permissão de localização necessária'}, {enableHighAccuracy:true,maximumAge:1000,timeout:15000});
+  go('andamento')
+})
+
+$('#btnPause').addEventListener('click',()=>{paused=!paused;$('#btnPause').textContent=paused?'Retomar':'Pausar';$('#status').textContent=paused?'Pausado':'Rastreando'})
+$('#btnStop').addEventListener('click',()=>{
+  running=false;paused=false;if(watchId){navigator.geolocation.clearWatch(watchId);watchId=null}
+  $('#status').textContent='Finalizado';
+  buildFinal()
+  go('finalizar')
+})
+
+function buildFinal(){
+  const t=elapsed,d=distM;
+  $('#fKmYou').textContent=fmtKm(d)+' km';$('#fTimeYou').textContent=fmtTime(t);$('#fPaceYou').textContent=paceMinPerKm(d,t)+' /km';$('#fSpdYou').textContent=kmh(d,t)+' km/h';
+  const t2=Math.max(30,Math.round(t*(0.94)));const d2=d*(0.995);
+  $('#fKmB').textContent=fmtKm(d2)+' km';$('#fTimeB').textContent=fmtTime(t2);$('#fPaceB').textContent=paceMinPerKm(d2,t2)+' /km';$('#fSpdB').textContent=kmh(d2,t2)+' km/h';
+  $('#fRoute').textContent=`Percurso em conjunto • ${fmtKm(d)} km`;
+
+  if(!mapFin.loaded())mapFin.once('load',drawFinal);else drawFinal();
+  function drawFinal(){
+    if(mapFin.getSource('routeF'))mapFin.getSource('routeF').setData({type:'Feature',geometry:routeGeo||{type:'LineString',coordinates:coords}});
+    else mapFin.addSource('routeF',{type:'geojson',data:{type:'Feature',geometry:routeGeo||{type:'LineString',coordinates:coords}}});
+    if(!mapFin.getLayer('routeF'))mapFin.addLayer({id:'routeF',type:'line',source:'routeF',paint:{'line-color':getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#F58220','line-width':6,'line-opacity':.98}});
+    if(coords.length){const bb=turf.bbox({type:'Feature',geometry:{type:'LineString',coordinates:coords}});mapFin.fitBounds([[bb[0],bb[1]],[bb[2],bb[3]]],{padding:40,duration:500})}
+    if(mapFin.getSource('startF'))mapFin.getSource('startF').setData({type:'Feature',geometry:{type:'Point',coordinates:coords[0]||[0,0]}});
+    else if(coords[0]){mapFin.addSource('startF',{type:'geojson',data:{type:'Feature',geometry:{type:'Point',coordinates:coords[0]}}});mapFin.addLayer({id:'startF',type:'circle',source:'startF',paint:{'circle-radius':6,'circle-color':getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#F58220','circle-stroke-width':2,'circle-stroke-color':'#fff'}})}
+    if(mapFin.getSource('endF'))mapFin.getSource('endF').setData({type:'Feature',geometry:{type:'Point',coordinates:coords[coords.length-1]||[0,0]}});
+    else if(coords[coords.length-1]){mapFin.addSource('endF',{type:'geojson',data:{type:'Feature',geometry:{type:'Point',coordinates:coords[coords.length-1]}}});mapFin.addLayer({id:'endF',type:'circle',source:'endF',paint:{'circle-radius':6,'circle-color':getComputedStyle(document.documentElement).getPropertyValue('--place-blue')||'#7DA7FF','circle-stroke-width':2,'circle-stroke-color':'#fff'}})}
+  }
+}
+
+const HIST_KEY='movase_hist_v1';
+function loadHist(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch{return[]}}
+function saveHist(item){const h=loadHist();h.unshift(item);localStorage.setItem(HIST_KEY,JSON.stringify(h.slice(0,50)));renderHist()}
+function renderHist(){const h=loadHist();$('#histCount').textContent=h.length;const list=$('#histList'),empty=$('#histEmpty');list.innerHTML='';if(!h.length){empty.style.display='grid';return}empty.style.display='none';h.forEach(it=>{
+  const el=document.createElement('div');el.className='hcard';
+  el.innerHTML=`<div class="mapmini" data-mini='${JSON.stringify(it.coords.slice(-120))}'></div><div class="body"><div><div class="name">${it.mod} • ${fmtKm(it.distM)} km</div><div class="meta">${new Date(it.ts).toLocaleString('pt-BR')} • com ${it.partner}</div><div class="meta">Você ${fmtTime(it.tYou)} vs ${it.partner.split(' ')[0]} ${fmtTime(it.tB)} • ${paceMinPerKm(it.distM,it.tYou)} /km</div></div><span class="tag">VS</span></div>`;
+  list.appendChild(el);
+  const mdiv=el.querySelector('.mapmini');const m=new maplibregl.Map({container:mdiv,style:'https://demotiles.maplibre.org/style.json',interactive:false,attributionControl:false});m.on('load',()=>{const c=it.coords;if(!c.length)return;const src='mini'+Math.random();m.addSource(src,{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:c}}});m.addLayer({id:src,type:'line',source:src,paint:{'line-color':getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#F58220','line-width':3}});const bb=turf.bbox({type:'Feature',geometry:{type:'LineString',coordinates:c}});m.fitBounds([[bb[0],bb[1]],[bb[2],bb[3]]],{padding:20})});
+})
+}
+$('#btnSaveHist').addEventListener('click',()=>{
+  const t=elapsed,d=distM,t2=Math.max(30,Math.round(t*(0.94))),d2=d*(0.995);
+  saveHist({ts:Date.now(),mod,partner,distM:d,coords:[...coords],tYou:t,dYou:d,tB:t2,dB:d2});
+  go('perfil')
+})
+renderHist()
+</script>
+</body>
+</html>

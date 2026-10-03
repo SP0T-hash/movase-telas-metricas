@@ -1,0 +1,131 @@
+- generic [ref=f1e2]:
+  - banner [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - button "Voltar" [ref=f1e5] [cursor=pointer]
+      - generic [ref=f1e8]:
+        - generic [ref=f1e9]: Atividade compartilhada
+        - generic [ref=f1e10]: Treino de hoje
+      - button "Compartilhar" [ref=f1e11] [cursor=pointer]
+    - tablist "Esporte" [ref=f1e14]:
+      - tab "Corrida" [selected] [ref=f1e15] [cursor=pointer]
+      - tab "Musculação" [ref=f1e16] [cursor=pointer]
+      - tab "Calistenia" [ref=f1e17] [cursor=pointer]
+      - tab "Ciclismo" [ref=f1e18] [cursor=pointer]
+  - generic [ref=f1e19]:
+    - generic [ref=f1e20]:
+      - generic [ref=f1e21]: Vocês treinaram juntos
+      - paragraph [ref=f1e22]: Hoje · 19:04 → 20:11 · Parque Ibirapuera
+      - generic [ref=f1e23]:
+        - generic [ref=f1e25]:
+          - generic [ref=f1e26]: Você
+          - generic [ref=f1e27]: 5:12 /km
+        - generic [ref=f1e28]: VS
+        - generic [ref=f1e30]:
+          - generic [ref=f1e31]: Rafa Almeida
+          - generic [ref=f1e32]: Córrida · 7ª série
+    - img "Mapa com o trajeto dos dois" [ref=f1e33]:
+      - generic [ref=f1e34]:
+        - generic [ref=f1e35]: Você
+        - generic [ref=f1e37]: Rafa
+      - generic [ref=f1e55]:
+        - generic [ref=f1e56]: Você — 8,42 km
+        - generic [ref=f1e58]: Rafa — 8,19 km
+      - button "Centralizar mapa" [ref=f1e60] [cursor=pointer]
+    - generic [ref=f1e64]:
+      - generic [ref=f1e65]:
+        - heading "Lado a lado" [level=2] [ref=f1e66]
+        - generic [ref=f1e67]: +0,23 km na frente
+      - generic [ref=f1e68]:
+        - generic [ref=f1e70]:
+          - generic [ref=f1e71]:
+            - generic [ref=f1e72]: Distância
+            - generic [ref=f1e73]:
+              - generic [ref=f1e74]: 8,42
+              - generic [ref=f1e75]: km
+              - generic [ref=f1e76]: /
+              - generic [ref=f1e77]: 8,19
+              - generic [ref=f1e78]: km
+          - generic [ref=f1e79]: Você na frente
+        - generic [ref=f1e86]:
+          - generic [ref=f1e87]:
+            - generic [ref=f1e88]: Tempo
+            - generic [ref=f1e89]:
+              - generic [ref=f1e90]: 44:07
+              - generic [ref=f1e91]: /
+              - generic [ref=f1e92]: 42:55
+          - generic [ref=f1e93]: Rafa na frente
+        - generic [ref=f1e100]:
+          - generic [ref=f1e101]:
+            - generic [ref=f1e102]: Pace médio
+            - generic [ref=f1e103]:
+              - generic [ref=f1e104]: 5:12
+              - generic [ref=f1e105]: /km
+              - generic [ref=f1e106]: /
+              - generic [ref=f1e107]: 5:14
+              - generic [ref=f1e108]: /km
+          - generic [ref=f1e109]: empate
+        - generic [ref=f1e116]:
+          - generic [ref=f1e117]:
+            - generic [ref=f1e118]: Ritmo máx.
+            - generic [ref=f1e119]:
+              - generic [ref=f1e120]: 4:31
+              - generic [ref=f1e121]: /km
+              - generic [ref=f1e122]: /
+              - generic [ref=f1e123]: 4:48
+              - generic [ref=f1e124]: /km
+          - generic [ref=f1e125]: empate
+        - generic [ref=f1e132]:
+          - generic [ref=f1e133]:
+            - generic [ref=f1e134]: Cadência
+            - generic [ref=f1e135]:
+              - generic [ref=f1e136]: "178"
+              - generic [ref=f1e137]: spm
+              - generic [ref=f1e138]: /
+              - generic [ref=f1e139]: "171"
+              - generic [ref=f1e140]: spm
+          - generic [ref=f1e141]: empate
+        - generic [ref=f1e148]:
+          - generic [ref=f1e149]:
+            - generic [ref=f1e150]: Desnível
+            - generic [ref=f1e151]:
+              - generic [ref=f1e152]: "+64"
+              - generic [ref=f1e153]: m
+              - generic [ref=f1e154]: /
+              - generic [ref=f1e155]: "+71"
+              - generic [ref=f1e156]: m
+          - generic [ref=f1e157]: Você na frente
+    - generic [ref=f1e163]:
+      - textbox "Comentário" [ref=f1e164]:
+        - /placeholder: Comentar com Rafa…
+      - button "Enviar" [disabled] [ref=f1e165]
+    - button "Convidar para o próximo" [ref=f1e166] [cursor=pointer]
+    - paragraph [ref=f1e167]: Rafa recebe um convite com o trajeto e o horário sugerido
+    - generic [ref=f1e168]:
+      - generic [ref=f1e169]:
+        - generic [ref=f1e170]:
+          - generic [ref=f1e171]: Sequência juntos
+          - generic [ref=f1e172]:
+            - generic [ref=f1e173]: "6"
+            - generic [ref=f1e174]: treinos no mesmo dia
+        - generic [ref=f1e175]: +320 XP
+      - paragraph [ref=f1e176]: Vocês são o duo mais consistente do Parque Ibirapuera em outubro. A próxima é quarta, 19h.
+    - generic [ref=f1e177]:
+      - generic [ref=f1e178]:
+        - heading "Recordes do duo" [level=2] [ref=f1e179]
+        - generic [ref=f1e180]: últimos 90 dias
+      - generic [ref=f1e181]:
+        - generic [ref=f1e185]:
+          - generic [ref=f1e186]: Melhor pace médio conjunto
+          - text: Rafa puxou · 14 de out
+        - generic [ref=f1e187]: 5:04/km
+      - generic [ref=f1e188]:
+        - generic [ref=f1e192]:
+          - generic [ref=f1e193]: Distância somada do mês
+          - text: Vocês dois · outubro
+        - generic [ref=f1e194]: 142 km
+      - generic [ref=f1e195]:
+        - generic [ref=f1e199]:
+          - generic [ref=f1e200]: Volume de musculação
+          - text: Vocês dois · 28 de out
+        - generic [ref=f1e201]: 18.420 kg
+  - complementary

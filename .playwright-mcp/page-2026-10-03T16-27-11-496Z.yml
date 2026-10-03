@@ -1,0 +1,181 @@
+- generic [ref=e2]:
+  - navigation [ref=e4]:
+    - link "movase" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - generic [ref=e10]:
+      - link "Como funciona" [ref=e11] [cursor=pointer]:
+        - /url: /como-funciona
+      - link "Parceiro de treino" [ref=e12] [cursor=pointer]:
+        - /url: /parceiro-de-treino
+      - link "Blog" [ref=e13] [cursor=pointer]:
+        - /url: /blog
+      - link "Para academias" [ref=e14] [cursor=pointer]:
+        - /url: /parceiros
+    - generic [ref=e15]:
+      - combobox "Idioma" [ref=e16]:
+        - option "Português (BR)" [selected]
+        - option "English (US)"
+      - link "Baixar o app" [ref=e17] [cursor=pointer]:
+        - /url: /go
+  - main [ref=e18]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: Tem gente treinando perto de você agora
+        - heading "Ninguém treina sozinho." [level=1] [ref=e25]:
+          - text: Ninguém treina
+          - generic [ref=e26]: sozinho.
+        - paragraph [ref=e27]: O Movase mostra quem está treinando por perto — mesma modalidade, mesmo horário, mesma academia. Vocês dão match, combinam no chat e aparecem.
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - link "Baixar na App Store" [ref=e30] [cursor=pointer]:
+              - /url: https://apps.apple.com/br/app/movase/id6799579336
+            - link "Baixar no Android" [ref=e31] [cursor=pointer]:
+              - /url: https://play.google.com/store/apps/details?id=fit.movase.app
+            - paragraph [ref=e32]: Escaneie ou abra pelo celular
+          - paragraph [ref=e33]: Grátis para baixar e para dar match · iOS e Android
+        - generic [ref=e36]:
+          - generic [ref=e37]: Localização por aproximação
+          - generic [ref=e38]: Conversa só depois do match
+          - generic [ref=e39]: Sem mensalidade
+      - generic [ref=e41]:
+        - img "Duas pessoas treinando lado a lado no chão de um estúdio" [ref=e42]
+        - generic [ref=e45]:
+          - strong [ref=e46]: Match com Rafa
+          - text: Musculação · hoje 19h · a 800 m
+        - generic [ref=e47]:
+          - generic [ref=e48]: perto de você
+          - generic [ref=e50]:
+            - generic [ref=e51]: Camila
+            - emphasis [ref=e52]: funcional
+          - generic [ref=e53]:
+            - generic [ref=e54]: Diego
+            - emphasis [ref=e55]: corrida
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]: Musculação
+        - generic [ref=e60]: Corrida
+        - generic [ref=e62]: Crossfit
+        - generic [ref=e64]: Yoga
+        - generic [ref=e66]: Natação
+        - generic [ref=e68]: Boxe
+        - generic [ref=e70]: Ciclismo
+        - generic [ref=e72]: Funcional
+        - generic [ref=e74]: Musculação
+        - generic [ref=e76]: Corrida
+        - generic [ref=e78]: Crossfit
+        - generic [ref=e80]: Yoga
+        - generic [ref=e82]: Natação
+        - generic [ref=e84]: Boxe
+        - generic [ref=e86]: Ciclismo
+        - generic [ref=e88]: Funcional
+      - generic [ref=e90]:
+        - generic [ref=e91]: Pilates
+        - generic [ref=e93]: Muay thai
+        - generic [ref=e95]: HIIT
+        - generic [ref=e97]: Caminhada
+        - generic [ref=e99]: Calistenia
+        - generic [ref=e101]: Hidroginástica
+        - generic [ref=e103]: Spinning
+        - generic [ref=e105]: Escalada
+        - generic [ref=e107]: Pilates
+        - generic [ref=e109]: Muay thai
+        - generic [ref=e111]: HIIT
+        - generic [ref=e113]: Caminhada
+        - generic [ref=e115]: Calistenia
+        - generic [ref=e117]: Hidroginástica
+        - generic [ref=e119]: Spinning
+        - generic [ref=e121]: Escalada
+    - generic [ref=e123]:
+      - generic [ref=e124]:
+        - text: Como funciona
+        - heading "Do mapa ao treino, sem grupo de WhatsApp parado." [level=2] [ref=e125]
+        - paragraph [ref=e126]: Você não precisa marcar com meia dúzia de gente para um aparecer. O Movase parte de quem já está indo treinar perto de você, agora.
+      - generic [ref=e127]:
+        - article [ref=e128]:
+          - heading "Mapa ao vivo de quem treina perto" [level=3] [ref=e133]
+          - paragraph [ref=e134]: Abra o app e veja pessoas disponíveis num raio ao redor de você — nunca o ponto exato de ninguém. Academias parceiras aparecem em destaque no mesmo mapa.
+          - generic [ref=e135]:
+            - generic [ref=e148]: Studio Norte · destaque
+            - generic [ref=e152]:
+              - generic [ref=e153]: pessoas perto
+              - generic [ref=e155]: academia parceira
+        - generic [ref=e157]:
+          - article [ref=e158]:
+            - heading "Filtre por modalidade e horário" [level=3] [ref=e162]
+            - paragraph [ref=e163]: "Musculação às 6h ou corrida no fim da tarde: o match só chega de quem treina o que você treina, quando você treina."
+            - generic [ref=e164]:
+              - generic [ref=e165]: Musculação
+              - generic [ref=e166]: Hoje, 18h–20h
+              - generic [ref=e167]: até 2 km
+              - generic [ref=e168]: Corrida
+              - generic [ref=e169]: Manhã
+          - article [ref=e170]:
+            - heading "Combine no chat e apareça" [level=3] [ref=e174]
+            - paragraph [ref=e175]: Deu match dos dois lados, abre a conversa. Combinam horário e ponto de encontro — e o check-in confirma quem chegou.
+            - generic [ref=e176]:
+              - generic [ref=e177]: Bora às 19h no Studio Norte?
+              - generic [ref=e178]: Fechado. Levo a corda 💪
+      - generic [ref=e179]:
+        - generic [ref=e184]:
+          - strong [ref=e185]: Localização por aproximação
+          - text: O mapa mostra a região, nunca o seu endereço nem o ponto exato de ninguém.
+        - generic [ref=e189]:
+          - strong [ref=e190]: Você decide quem fala com você
+          - text: Conversa só existe depois do match dos dois lados. Bloquear e denunciar em dois toques.
+        - generic [ref=e194]:
+          - strong [ref=e195]: Grátis para treinar
+          - text: Criar perfil, ver o mapa e dar match não custa nada. Quem paga é a academia que quer destaque.
+    - generic [ref=e198]:
+      - img "Sala de musculação com rack de halteres e alunos treinando" [ref=e200]
+      - generic [ref=e201]:
+        - text: Para academias
+        - heading "Sua academia no mapa de quem já decidiu treinar hoje." [level=2] [ref=e202]
+        - paragraph [ref=e203]: "Quem abre o Movase não está pesquisando preço: está procurando onde e com quem treinar agora. Academias parceiras aparecem em destaque nesse mapa."
+        - list [ref=e204]:
+          - listitem [ref=e205]: Destaque no mapa da sua região
+          - listitem [ref=e208]: Página da academia com modalidades e horários
+          - listitem [ref=e211]: Conversa com o nosso time — sem contratação automática
+        - generic [ref=e214]:
+          - link "Falar com o time" [ref=e215] [cursor=pointer]:
+            - /url: /parceiros
+          - generic [ref=e218]: Resposta pelo WhatsApp, em horário comercial.
+    - generic [ref=e222]:
+      - text: Baixe o Movase
+      - heading "Amanhã fica mais fácil quando alguém está te esperando." [level=2] [ref=e223]
+      - paragraph [ref=e224]: Criar o perfil leva menos de dois minutos. O resto acontece no mapa.
+      - generic [ref=e226]:
+        - link "Baixar na App Store" [ref=e227] [cursor=pointer]:
+          - /url: https://apps.apple.com/br/app/movase/id6799579336
+        - link "Baixar no Android" [ref=e228] [cursor=pointer]:
+          - /url: https://play.google.com/store/apps/details?id=fit.movase.app
+        - paragraph [ref=e229]: Escaneie ou abra pelo celular
+  - contentinfo [ref=e230]:
+    - generic [ref=e231]:
+      - generic [ref=e232]:
+        - generic [ref=e233]:
+          - text: movase
+          - paragraph [ref=e234]: O Movase mostra quem está treinando por perto — mesma modalidade, mesmo horário, mesma academia. Vocês dão match, combinam no chat e aparecem.
+        - generic [ref=e235]:
+          - heading "Produto" [level=4] [ref=e236]
+          - link "Como funciona" [ref=e237] [cursor=pointer]:
+            - /url: /como-funciona
+          - link "Blog" [ref=e238] [cursor=pointer]:
+            - /url: /blog
+          - link "Parceiro de treino" [ref=e239] [cursor=pointer]:
+            - /url: /parceiro-de-treino
+          - link "Como conseguir alunos" [ref=e240] [cursor=pointer]:
+            - /url: /guia/como-conseguir-alunos-personal-trainer
+          - link "Como escolher um personal" [ref=e241] [cursor=pointer]:
+            - /url: /guia/como-escolher-personal-trainer
+        - generic [ref=e242]:
+          - heading "Empresa" [level=4] [ref=e243]
+          - link "Para academias" [ref=e244] [cursor=pointer]:
+            - /url: /parceiros
+          - link "Termos de Uso" [ref=e245] [cursor=pointer]:
+            - /url: /termos
+          - link "Política de Privacidade" [ref=e246] [cursor=pointer]:
+            - /url: /privacidade
+      - generic [ref=e247]:
+        - generic [ref=e248]: © 2026 Movase. Todos os direitos reservados.
+        - link "Siga o Movase no Instagram" [ref=e250] [cursor=pointer]:
+          - /url: https://www.instagram.com/movase_app/

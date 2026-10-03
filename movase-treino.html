@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Movase — Treinar Junto</title>
+<style>
+/* Tokens nativos Movase */
+:root{
+  color-scheme:light;
+  --accent:#F58220; --accent-on:#0A0A0A;
+  --bg:#FFFFFF; --fg:#0A0A0A; --fg-2:#57534E; --meta:#57534E;
+  --muted:#F5F5F4; --surface:#F5F5F4; --surface-warm:#FFF4E8;
+  --border:#E7E5E4; --place-blue:#003399;
+  --accent-text:#8A3F08;
+  --r-sm:8px; --r-md:20px; --r-pill:9999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;
+  --t-xs:11.5px;--t-sm:13px;--t-base:15px;--t-lg:19px;--t-xl:25px;
+  --sans:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{color-scheme:dark;
+    --bg:#0C0A09;--fg:#FAFAF9;--fg-2:#A8A29E;--meta:#A8A29E;
+    --muted:#1C1917;--surface:#1C1917;--surface-warm:#2A1A0C;
+    --border:#292524;--place-blue:#7DA7FF;--accent-text:#F58220;
+  }
+}
+:root[data-theme=dark]{color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--muted);color:var(--fg);font:400 var(--t-base)/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.phone{max-width:430px;margin:0 auto;background:var(--bg);min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto}
+@media (min-width:480px){.phone{margin:24px auto;border-radius:var(--r-md);overflow:clip;min-height:calc(100dvh - 48px)}}
+.bar{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-bottom:1px solid var(--border)}
+.bar h1{font-size:var(--t-xl);font-weight:800;flex:1;margin:0;letter-spacing:-.015em}
+.ib{width:40px;height:40px;border-radius:var(--r-pill);display:grid;place-items:center}
+.ib svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.scroll{overflow-y:auto;overscroll-behavior:contain;padding:var(--s4) var(--s4) var(--s8)}
+.screen{display:none}
+.screen[data-on]{display:block}
+.seg{display:flex;gap:2px;padding:3px;background:var(--muted);border-radius:var(--r-pill);overflow-x:auto}
+.seg button{flex:1 0 auto;min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);font-size:var(--t-base);font-weight:700;color:var(--meta)}
+.seg button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.surface{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip;margin:var(--s4) 0}
+.row{display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4);text-align:left}
+.row+.row{border-top:1px solid var(--border)}
+.av{width:44px;height:44px;border-radius:var(--r-pill);display:grid;place-items:center;font-weight:800;color:#fff}
+.av.a{background:var(--accent);color:var(--accent-on)}
+.av.b{background:var(--place-blue);color:#0A0A0A}
+.name{font-weight:700}
+.meta{font-size:var(--t-sm);color:var(--meta)}
+.tag{display:inline-flex;padding:3px 9px;border-radius:var(--r-pill);background:var(--surface-warm);color:var(--accent-text);font-size:var(--t-xs);font-weight:800}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 var(--s5);border-radius:var(--r-pill);font-weight:800;background:var(--accent);color:var(--accent-on);width:100%}
+.btn.ghost{background:var(--muted);color:var(--fg)}
+.tabs{display:grid;grid-auto-flow:column;border-top:1px solid var(--border);background:var(--bg)}
+.tabs button{min-height:52px;font-size:var(--t-base);font-weight:700;color:var(--fg-2);display:grid;justify-items:center;gap:2px}
+.tabs button[aria-current=page]{color:var(--accent)}
+.big{font-size:var(--t-xl);font-weight:800;letter-spacing:-.02em}
+.split{display:grid;grid-template-columns:1fr 1px 1fr;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip;margin:var(--s4) 0}
+.col{padding:var(--s4)}
+.vs{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:var(--r-pill);background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:var(--t-xs);font-weight:800;color:var(--fg-2)}
+.rail{position:relative;background:var(--border)}
+.k{font-size:var(--t-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--meta);font-weight:700}
+.map{aspect-ratio:16/9;background:var(--muted);border:1px solid var(--border);border-radius:var(--r-md);margin:var(--s4) 0;display:grid;place-items:center;color:var(--fg-2);font-size:var(--t-sm)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header class="bar">
+    <button class="ib" id="back" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h1 id="title">Mapa</h1>
+    <button class="ib" id="theme" aria-label="Tema"><svg id="theme-ico" viewBox="0 0 24 24"></svg></button>
+  </header>
+
+  <main class="scroll" id="main">
+    <!-- MAPA/CONVITE -->
+    <section class="screen" data-s="mapa" data-on>
+      <h2>Chamar pra treinar</h2>
+      <p class="meta">Selecione modalidade e convide alguém com quem você já deu match.</p>
+      <div class="seg" role="group" aria-label="Modalidade">
+        <button aria-pressed="true">Corrida</button>
+        <button aria-pressed="false">Musculação</button>
+        <button aria-pressed="false">Calistenia</button>
+        <button aria-pressed="false">Ciclismo</button>
+      </div>
+      <h3 style="margin:var(--s5) 0 var(--s2);font-size:var(--t-base);font-weight:800">Matches</h3>
+      <div class="surface">
+        <button class="row" data-goto="chat">
+          <span class="av a">RA</span>
+          <span><div class="name">Rafa Alencar</div><div class="meta">Calistenia · frequências parecidas</div></span>
+          <span class="tag">Chamar</span>
+        </button>
+        <button class="row" data-goto="chat">
+          <span class="av b">JO</span>
+          <span><div class="name">Júlia Okafor</div><div class="meta">Corrida · treina 3x/sem</div></span>
+          <span class="tag">Chamar</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section class="screen" data-s="chat">
+      <h2>Chat com Rafa Alencar</h2>
+      <div class="surface">
+        <div class="row">
+          <span class="av a">RA</span>
+          <span><div class="name">Rafa aceitou o convite</div><div class="meta">Vocês combinaram correr hoje</div></span>
+          <span class="tag">Corrida</span>
+        </div>
+      </div>
+      <button class="btn" data-goto="andamento">Iniciar treino junto</button>
+      <button class="btn ghost" style="margin-top:var(--s2)" data-goto="mapa">Voltar</button>
+    </section>
+
+    <!-- TREINO EM ANDAMENTO -->
+    <section class="screen" data-s="andamento">
+      <h2>Treino em andamento • Corrida</h2>
+      <div class="surface" style="padding:var(--s4)">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div><div class="k">Tempo</div><div class="big" id="timer">00:00:00</div></div>
+          <div style="text-align:right"><div class="k">Km</div><div class="big" id="km">0,00</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin-top:var(--s4)">
+          <div><div class="k">Pace</div><div style="font-size:var(--t-lg);font-weight:800">--'--"/km</div></div>
+          <div><div class="k">Ritmo atual</div><div style="font-size:var(--t-lg);font-weight:800">--'--"/km</div></div>
+        </div>
+      </div>
+      <div class="map">Mapa (simulado)</div>
+      <button class="btn" data-goto="finalizar">Finalizar treino</button>
+    </section>
+
+    <!-- FINALIZAR -->
+    <section class="screen" data-s="finalizar">
+      <h2>Treino finalizado</h2>
+      <div class="split">
+        <div class="col">
+          <div style="display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)">
+            <span class="av a">VC</span><span class="name">Você</span>
+          </div>
+          <div class="m"><div class="k">Distância</div><div class="v" style="font-size:var(--t-xl);font-weight:800">6,84 km</div></div>
+          <div class="m"><div class="k">Tempo</div><div style="font-weight:700">38m 12s</div></div>
+          <div class="m"><div class="k">Pace</div><div style="font-weight:700">5'35"/km</div></div>
+        </div>
+        <div class="rail"><div class="vs">VS</div></div>
+        <div class="col">
+          <div style="display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)">
+            <span class="av b">RA</span><span class="name">Rafa</span>
+          </div>
+          <div class="m"><div class="k">Distância</div><div class="v" style="font-size:var(--t-xl);font-weight:800">6,84 km</div></div>
+          <div class="m"><div class="k">Tempo</div><div style="font-weight:700">35m 48s</div></div>
+          <div class="m"><div class="k">Pace</div><div style="font-weight:700">5'14"/km</div></div>
+        </div>
+      </div>
+      <div class="surface">
+        <div class="row" style="grid-template-columns:1fr 1fr">
+          <span class="k">Percurso em conjunto</span><span class="meta" style="text-align:right">Mesmo trajeto</span>
+        </div>
+      </div>
+      <button class="btn" data-goto="perfil">Salvar no histórico</button>
+      <button class="btn ghost" style="margin-top:var(--s2)" data-goto="mapa">Descartar</button>
+    </section>
+
+    <!-- PERFIL + HISTÓRICO -->
+    <section class="screen" data-s="perfil">
+      <h2>Perfil</h2>
+      <div class="surface">
+        <div class="row">
+          <span class="av a">VC</span>
+          <span><div class="name">Você</div><div class="meta">Movase • 24 treinos</div></span>
+        </div>
+      </div>
+      <div class="seg" style="margin-top:var(--s4)">
+        <button aria-pressed="true">Histórico</button>
+        <button aria-pressed="false">Stats</button>
+        <button aria-pressed="false">Amigos</button>
+      </div>
+      <h3 style="margin:var(--s5) 0 var(--s2);font-size:var(--t-base);font-weight:800">Treinos em conjunto</h3>
+      <div class="surface">
+        <div class="row">
+          <span class="av b">RA</span>
+          <span><div class="name">Corrida • 6,84 km</div><div class="meta">Hoje • com Rafa Alencar • 38m12 vs 35m48</div></span>
+          <span class="tag">VS</span>
+        </div>
+        <div class="row">
+          <span class="av b">BT</span>
+          <span><div class="name">Musculação • Peito</div><div class="meta">Ontem • com Beto Tavares • treino marcado em conjunto</div></span>
+          <span class="tag">Juntos</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-t="mapa" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Mapa</button>
+    <button data-t="chat"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat</button>
+    <button data-t="andamento"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Treino</button>
+    <button data-t="perfil"><svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9.5" cy="7" r="3.5"/></svg>Perfil</button>
+  </nav>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const TIT={mapa:'Mapa',chat:'Chat',andamento:'Treino em andamento',finalizar:'Finalizar treino',perfil:'Perfil'};
+let on='mapa',stack=[];
+function go(n){if(n!==on)stack.push(on);on=n;$$('.screen').forEach(s=>s.toggleAttribute('data-on',s.dataset.s===on));$('#title').textContent=TIT[on];$$('.tabs button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.t===on));$('#back').hidden=!stack.length;}
+$$('.tabs button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.t)));
+document.addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if(g)go(g.dataset.goto);});
+$('#back').addEventListener('click',()=>{if(stack.length)go(stack.pop());});
+$$('.seg button').forEach(b=>b.addEventListener('click',()=>{$$('button',b.parentNode).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
+
+// tema
+const SUN='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>';
+const MOON='<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>';
+function paint(){const d=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');$('#theme-ico').innerHTML=d==='dark'?SUN:MOON;}
+$('#theme').addEventListener('click',()=>{const c=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.dataset.theme=c==='dark'?'light':'dark';paint();});
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',paint);paint();
+
+// cronômetro simples
+let t=0,iv=null;
+function tick(){t++;const h=String(Math.floor(t/3600)).padStart(2,'0'),m=String(Math.floor(t/60)%60).padStart(2,'0'),s=String(t%60).padStart(2,'0');$('#timer').textContent=h+':'+m+':'+s;$('#km').textContent=(t/600).toFixed(2);}
+document.addEventListener('click',e=>{if(e.target.closest('[data-goto="andamento"]')){t=0;$('#timer').textContent='00:00:00';$('#km').textContent='0,00';if(iv)clearInterval(iv);iv=setInterval(tick,1000);} if(e.target.closest('[data-goto="finalizar"]')||e.target.closest('[data-goto="perfil"]')){if(iv){clearInterval(iv);iv=null;}}},true);
+</script>
+</body>
+</html>
+<script>document.addEventListener('DOMContentLoaded',()=>{
+  const h = location.hash.replace('#','');
+  if (h && document.querySelector(`.screen[data-s="${h}"]`)) {
+    document.querySelectorAll('.screen').forEach(s => s.toggleAttribute('data-on', s.dataset.s === h));
+    document.querySelectorAll('.tabs button').forEach(b => b.toggleAttribute('aria-current', b.dataset.t === h));
+    document.getElementById('title').textContent = ({
+      mapa:'Mapa',chat:'Chat',andamento:'Treino em andamento',finalizar:'Finalizar treino',perfil:'Perfil'
+    })[h] || h;
+  }
+});</script>

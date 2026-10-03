@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Movase — Comparação Strava</title>
+<style>
+/* Tokens nativos Movase (extraídos do APK) + correções AA */
+:root{
+  color-scheme:light;
+  --accent:#F58220; --accent-on:#0A0A0A;  /* app: #FFF 2.59:1 → corrigido para AA */
+  --bg:#FFFFFF; --fg:#0A0A0A; --fg-2:#57534E; --meta:#57534E;
+  --muted:#F5F5F4; --surface:#F5F5F4; --surface-warm:#FFF4E8;
+  --border:#E7E5E4; --place-blue:#003399;
+  --accent-text:#8A3F08;
+  --r-sm:8px; --r-md:20px; --r-pill:9999px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;--s6:24px;--s8:32px;--s10:40px;
+  --t-xs:11.5px;--t-sm:13px;--t-base:15px;--t-lg:19px;--t-xl:25px;
+  --sans:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+@media (prefers-color-scheme:dark){
+  :root{color-scheme:dark;
+    --bg:#0C0A09;--fg:#FAFAF9;--fg-2:#A8A29E;--meta:#A8A29E;
+    --muted:#1C1917;--surface:#1C1917;--surface-warm:#2A1A0C;
+    --border:#292524;--place-blue:#7DA7FF;--accent-text:#F58220;
+  }
+}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--muted);color:var(--fg);font:400 var(--t-base)/1.5 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+
+.phone{max-width:430px;margin:0 auto;background:var(--bg);min-height:100dvh;display:grid;grid-template-rows:auto 1fr;box-shadow:0 1px 2px rgba(0,0,0,.06),0 18px 40px -14px rgba(0,0,0,.12)}
+@media (min-width:480px){ .phone{margin:24px auto;border-radius:var(--r-md);overflow:clip;min-height:calc(100dvh - 48px)} }
+
+.bar{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-bottom:1px solid var(--border);background:var(--bg)}
+.bar h1{font-size:var(--t-lg);font-weight:800;letter-spacing:-.015em;margin:0;flex:1}
+.ib{width:40px;height:40px;border-radius:var(--r-pill);display:grid;place-items:center}
+.ib:active{transform:scale(.94)}
+.ib svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.scroll{overflow-y:auto;overscroll-behavior:contain;padding:var(--s4) var(--s4) var(--s8)}
+h2{font-size:var(--t-lg);font-weight:800;margin:0 0 var(--s2);letter-spacing:-.015em}
+.measure{font-size:var(--t-sm);color:var(--meta);margin:0 0 var(--s4)}
+
+.surface{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip;margin:var(--s4) 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);padding:var(--s4)}
+.line{display:flex;justify-content:space-between;padding:var(--s3) var(--s4);border-top:1px solid var(--border)}
+.line:first-child{border-top:0}
+.line .k{font-size:var(--t-sm);color:var(--meta)}
+.line .v{font-size:var(--t-base);font-weight:700;text-align:right;max-width:60%;text-wrap:balance}
+.line .v.small{font-size:var(--t-sm);font-weight:600}
+
+.split{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip}
+.split-rail{background:var(--border);position:relative}
+.vs{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:var(--r-pill);background:var(--bg);border:1px solid var(--border);display:grid;place-items:center;font-size:var(--t-xs);font-weight:800;color:var(--fg-2);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.col{padding:var(--s4)}
+.col-header{display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)}
+.av{width:36px;height:36px;border-radius:var(--r-pill);display:grid;place-items:center;font-weight:800;font-size:var(--t-xs);color:#fff}
+.av.a{background:var(--accent);color:var(--accent-on)}
+.av.b{background:var(--place-blue);color:#fff}
+.name{font-weight:700;font-size:var(--t-base)}
+.m{margin:var(--s2) 0}
+.m .k{font-size:var(--t-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--meta);font-weight:700}
+.m .v{font-size:var(--t-xl);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-top:2px}
+.m .sub{font-size:var(--t-sm);color:var(--meta);margin-top:2px}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--r-pill);background:var(--surface-warm);color:var(--accent-text);font-size:var(--t-xs);font-weight:800;margin:var(--s3) 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s5);border-radius:var(--r-pill);font-weight:800;background:var(--accent);color:var(--accent-on);width:100%;margin-top:var(--s4)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header class="bar">
+    <button class="ib" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h1>Compartilhar treino</h1>
+    <button class="ib" id="theme" aria-label="Alternar tema"><svg id="theme-ico" viewBox="0 0 24 24"></svg></button>
+  </header>
+  <main class="scroll">
+    <h2>Movase × Strava • Comparação</h2>
+    <p class="measure">Card pensados pra gerar divulgação orgânica. Usa somente linguagem visual do Movase.</p>
+
+    <div class="split" role="group" aria-label="Comparação lado a lado">
+      <div class="col">
+        <div class="col-header">
+          <span class="av a">VC</span>
+          <span class="name">Você</span>
+        </div>
+        <div class="m"><div class="k">Distância</div><div class="v">6,84 km</div></div>
+        <div class="m"><div class="k">Tempo</div><div class="v">38m 12s</div></div>
+        <div class="m"><div class="k">Ritmo</div><div class="v">5'35"/km</div><div class="sub">Média</div></div>
+        <div class="m"><div class="k">Elevação</div><div class="v">92 m</div></div>
+        <div class="m"><div class="k">FC média</div><div class="v">162 bpm</div></div>
+      </div>
+      <div class="split-rail"><div class="vs">VS</div></div>
+      <div class="col">
+        <div class="col-header">
+          <span class="av b">RA</span>
+          <span class="name">Rafa Alencar</span>
+        </div>
+        <div class="m"><div class="k">Distância</div><div class="v">6,84 km</div></div>
+        <div class="m"><div class="k">Tempo</div><div class="v">35m 48s</div></div>
+        <div class="m"><div class="k">Ritmo</div><div class="v">5'14"/km</div><div class="sub">+21s/km melhor</div></div>
+        <div class="m"><div class="k">Elevação</div><div class="v">98 m</div></div>
+        <div class="m"><div class="k">FC média</div><div class="v">158 bpm</div></div>
+      </div>
+    </div>
+
+    <div class="surface">
+      <div class="line"><span class="k">Tempo do trecho</span><span class="v">+2m 24s a seu favor</span></div>
+      <div class="line"><span class="k">Ganho na distância</span><span class="v">Mesmo percurso</span></div>
+      <div class="line"><span class="k">Motivador</span><span class="v small">Vocês treinam com frequência parecida</span></div>
+      <div class="line"><span class="k">Ponto positivo</span><span class="v small">Ajuda nas cargas</span></div>
+    </div>
+
+    <div class="badge">Treinar junto no Movase</div>
+
+    <button class="btn">Gerar card pra compartilhar</button>
+  </main>
+</div>
+
+<script>
+const SUN='<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>';
+const MOON='<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>';
+function paint(){
+  const dark=document.documentElement.dataset.theme?document.documentElement.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+  document.getElementById('theme-ico').innerHTML=dark?SUN:MOON;
+}
+document.getElementById('theme').addEventListener('click',()=>{
+  const cur=document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next; try{localStorage.setItem('movase-theme',next)}catch{}
+  paint();
+});
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',paint);
+try{const s=localStorage.getItem('movase-theme');if(s)document.documentElement.dataset.theme=s}catch{}
+paint();
+</script>
+</body>
+</html>

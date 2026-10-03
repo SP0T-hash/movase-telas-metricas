@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Movase — Treinar Junto</title>
+<style>
+/* ─────────────────────────────────────────────────────────────────
+   TOKENS
+   Fonte: res/raw/theme.json de fit.movase.app v2.2.21 (APK Android).
+   `light-dark()` deixa o bloco único e o toggle só muda color-scheme.
+
+   Dois bugs de acessabilidade no contrato do app, corrigidos aqui:
+   1. accent-on #FFFFFF sobre accent #F58220 = 2.59:1 (precisa 4.5 em
+      texto e 3:1 como componente de UI). → #0A0A0A = 7.62:1.
+   2. place-blue #003399 sobre bg #0C0A09 = 1.82:1. O contrato não tem
+      variante clara. → #7DA7FF = 7.4:1 no dark.
+   ───────────────────────────────────────────────────────────────── */
+:root{
+  color-scheme:light;
+
+  /* contrato, light */
+  --accent:        light-dark(#F58220,#F58220);
+  --accent-on:     light-dark(#0A0A0A,#0A0A0A);      /* contrato: #FFFFFF — 2.59:1 */
+  --bg:            light-dark(#FFFFFF,#0C0A09);
+  --fg:            light-dark(#0A0A0A,#FAFAF9);
+  --fg-2:          light-dark(#57534E,#A8A29E);
+  --meta:          light-dark(#57534E,#A8A29E);
+  --muted:         light-dark(#F5F5F4,#1C1917);
+  --surface:       light-dark(#F5F5F4,#1C1917);
+  --surface-warm:  light-dark(#FFF4E8,#2A1A0C);
+  --border:        light-dark(#E7E5E4,#292524);
+  --place-blue:    light-dark(#003399,#7DA7FF);      /* contrato dark: #003399 — 1.82:1 */
+
+  /* 3. accent #F58220 sobre surface-warm #FFF4E8 = 2.40:1. O contrato usa
+     esse par nas badges do app e reprova. accent continua sendo o preenchimento
+     da marca; para TEXTO sobre fundo claro entra um laranja mais escuro. */
+  --accent-text:   light-dark(#8A3F08,#F58220);
+
+  /* derivado, p/ os dois fundos do accent */
+  --accent-soft:   light-dark(rgba(245,130,32,.13),rgba(245,130,32,.18));
+  --accent-line:   light-dark(rgba(245,130,32,.34),rgba(245,130,32,.42));
+  --blue-soft:     light-dark(rgba(0,51,153,.09),rgba(125,167,255,.14));
+  --shadow:        light-dark(0 1px 2px rgba(12,10,9,.05),0 1px 2px rgba(0,0,0,.5));
+  --shadow-lift:   light-dark(0 2px 4px rgba(12,10,9,.05),0 2px 6px rgba(0,0,0,.55));
+  --shadow-pop:    light-dark(0 2px 4px rgba(12,10,9,.05),0 2px 6px rgba(0,0,0,.6)),
+                   0 18px 40px -14px light-dark(rgba(12,10,9,.2),rgba(0,0,0,.7));
+
+  /* radius do contrato: sm 8 · md 20 · pill */
+  --r-sm:8px; --r-md:20px; --r-pill:9999px;
+
+  /* espaçamento e tipo: NÃO estão no contrato (o source do theme.json
+     aponta pra um DESIGN.md externo). Inferidos de 4px e escala 1.25. */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s10:40px;
+  --t-xs:11.5px; --t-sm:13px; --t-base:15px; --t-lg:19px; --t-xl:25px; --t-2xl:32px;
+
+  /* o app usa FontFamily.Default (Roboto). Sem typeface custom — respeitado. */
+  --sans:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --ease:cubic-bezier(.23,1,.32,1);      /* ease-out forte, nunca ease-in */
+  --pop:cubic-bezier(.32,.72,0,1);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme=light]){color-scheme:dark} }
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+
+/* ── superfícies de browser: sem isso a página foi montada, não desenhada ── */
+::selection{background:var(--accent-soft);color:var(--fg)}
+*{scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:9999px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--fg-2);background-clip:content-box}
+input,textarea{caret-color:var(--accent)}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+::placeholder{color:var(--fg-2);opacity:1}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--muted);color:var(--fg);font:400 var(--t-base)/1.5 var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  display:grid;place-items:start center;min-height:100dvh;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+button,input,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+svg{display:block}
+h1,h2,h3,p{margin:0}
+h1{font-size:var(--t-2xl);line-height:1.1;font-weight:800;letter-spacing:-.022em;text-wrap:balance}
+h2{font-size:var(--t-lg);line-height:1.2;font-weight:800;letter-spacing:-.015em}
+h3{font-size:var(--t-base);line-height:1.3;font-weight:700}
+.measure{max-width:68ch}
+
+/* ── casca ── */
+.phone{
+  width:100%;max-width:430px;min-height:100dvh;background:var(--bg);
+  display:grid;grid-template-rows:auto 1fr auto;position:relative;
+  box-shadow:var(--shadow-pop);
+}
+@media (min-width:480px){ .phone{margin:24px 0;border-radius:var(--r-md);overflow:clip;min-height:calc(100dvh - 48px)} }
+
+.bar{
+  display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);
+  background:var(--bg);border-bottom:1px solid var(--border);position:relative;z-index:6;
+}
+.bar h1{font-size:var(--t-lg);letter-spacing:-.015em}
+.bar .grow{flex:1 1 auto;min-width:0}
+.ib{
+  width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;
+  border-radius:var(--r-pill);color:var(--fg);transition:background-color 160ms var(--ease),transform 140ms var(--ease);
+}
+.ib:active{transform:scale(.94)}
+.ib:hover{background:var(--muted)}
+.ib svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+.scroll{overflow-y:auto;overscroll-behavior:contain;padding-bottom:var(--s6)}
+.screen{padding:var(--s4);display:none}
+.screen[data-on]{display:block}
+
+/* ── tabbar ── */
+.tabs{
+  display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;
+  padding:var(--s2) var(--s1) calc(var(--s2) + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);background:var(--bg);position:sticky;bottom:0;z-index:6;
+}
+.tabs button{
+  display:grid;justify-items:center;gap:3px;padding:6px 2px;min-height:52px;border-radius:var(--r-sm);
+  font-size:var(--t-base);font-weight:700;color:var(--fg-2);letter-spacing:.01em;
+  transition:color 160ms var(--ease),background-color 160ms var(--ease),transform 140ms var(--ease);
+}
+.tabs button:active{transform:scale(.95)}
+.tabs button svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tabs button[aria-current=page]{color:var(--accent)}
+
+/* ── botões ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+  min-height:44px;padding:0 var(--s5);border-radius:var(--r-pill);
+  font-size:var(--t-base);font-weight:800;letter-spacing:-.01em;white-space:nowrap;
+  /* a opacidade vem da variável: .screen[data-on]>* também é (0,2,0) e vem
+     depois no stylesheet, então um `opacity` direto seria anulado por ele. */
+  opacity:var(--btn-op,1);
+  transition:transform 160ms var(--ease),background-color 160ms var(--ease),opacity 160ms var(--ease);
+}
+.btn:active{transform:scale(.97)}
+.btn svg{width:19px;height:19px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.btn-p{background:var(--accent);color:var(--accent-on)}
+.btn-p:hover{background:color-mix(in oklab,var(--accent) 92%,var(--fg))}
+.btn-s{background:var(--muted);color:var(--fg)}
+.btn-s:hover{background:var(--surface-warm)}
+.btn-g{border:1.5px solid var(--border);color:var(--fg);background:var(--bg)}
+.btn-g:hover{border-color:var(--fg-2)}
+.btn[disabled],.btn[aria-busy=true]{--btn-op:.42;pointer-events:none}
+.btn-block{width:100%}
+
+/* ── superfície + linhas (sem card aninhado) ── */
+.surface{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);overflow:clip}
+.row{
+  display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center;
+  width:100%;text-align:left;padding:var(--s3) var(--s4);position:relative;
+  transition:background-color 160ms var(--ease),transform 140ms var(--ease);
+}
+.row:active{transform:scale(.99)}
+@media (hover:hover) and (pointer:fine){ .row:hover{background:var(--surface-warm)} }
+.row+.row::before{content:"";position:absolute;top:0;left:calc(44px + var(--s3) + var(--s3));right:0;height:1px;background:var(--border)}
+.av{
+  width:44px;height:44px;border-radius:var(--r-pill);display:grid;place-items:center;
+  font-size:var(--t-sm);font-weight:800;letter-spacing:.02em;color:#fff;background:var(--place-blue);
+}
+.av-2{background:var(--accent);color:var(--accent-on)}
+.row b{display:block;font-size:var(--t-base);font-weight:700;letter-spacing:-.01em}
+.row small{display:block;font-size:var(--t-sm);color:var(--meta);line-height:1.35}
+.dist{font-size:var(--t-sm);font-weight:700;color:var(--meta);white-space:nowrap}
+
+.tag{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--r-pill);
+  background:var(--surface-warm);color:var(--accent-text);
+  font-size:var(--t-xs);font-weight:800;letter-spacing:.01em;white-space:nowrap;
+}
+.tag-blue{background:var(--blue-soft);color:var(--place-blue)}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+
+/* ── mapa ── */
+.map{position:relative;aspect-ratio:4/5;border-radius:var(--r-md);overflow:clip;background:var(--muted);border:1px solid var(--border);padding:var(--s2)}
+.map svg{width:100%;height:100%}
+.pin{transition:transform 200ms var(--pop)}
+.pin:active{transform:scale(.92)}
+.map-tools{position:absolute;top:var(--s3);right:var(--s3);display:grid;gap:var(--s2)}
+.map-tools .ib{background:var(--bg);border:1px solid var(--border);box-shadow:var(--shadow-lift);width:44px;height:44px;flex-basis:44px}
+.map-foot{
+  position:absolute;left:var(--s3);right:var(--s3);bottom:var(--s3);
+  display:flex;gap:var(--s2);align-items:center;
+}
+.map-foot .btn{flex:1 1 auto;box-shadow:var(--shadow-pop)}
+
+/* ── segmentado ── */
+.seg{display:flex;gap:2px;padding:3px;background:var(--muted);border-radius:var(--r-pill);overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{
+  flex:1 0 auto;min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);
+  font-size:var(--t-base);font-weight:700;color:var(--meta);white-space:nowrap;
+  transition:background-color 180ms var(--ease),color 180ms var(--ease);
+}
+.seg button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:var(--shadow)}
+
+/* ── estado vazio ── */
+.empty{display:grid;justify-items:center;gap:var(--s3);padding:var(--s8) var(--s5);text-align:center}
+.empty svg{width:40px;height:40px;stroke:var(--fg-2);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.empty p{font-size:var(--t-sm);color:var(--meta);max-width:34ch;text-wrap:pretty}
+
+/* ── avaliação ── */
+.stars{display:flex;gap:var(--s2)}
+.stars button{width:52px;height:52px;display:grid;place-items:center;border-radius:var(--r-pill);
+  background:var(--muted);color:var(--fg-2);
+  transition:transform 160ms var(--ease),background-color 160ms var(--ease),color 160ms var(--ease)}
+.stars button:active{transform:scale(.9)}
+.stars button[aria-pressed=true]{background:var(--accent);color:var(--accent-on)}
+.stars svg{width:26px;height:26px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.chip{
+  min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);
+  border:1.5px solid var(--border);font-size:var(--t-sm);font-weight:700;color:var(--fg-2);
+  transition:transform 160ms var(--ease),border-color 160ms var(--ease),background-color 160ms var(--ease);
+}
+.chip:active{transform:scale(.95)}
+.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+
+/* ── convite ── */
+.pass{background:var(--surface-warm);border:1px solid var(--accent-line);border-radius:var(--r-md);padding:var(--s5)}
+.code{
+  display:block;margin-top:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-sm);
+  background:var(--bg);border:1px dashed var(--accent-line);
+  font:700 20px/1 var(--mono);letter-spacing:.14em;color:var(--accent-text);text-align:center;
+}
+
+/* ── movimento: um momento autoral, entrada ease-out ── */
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screen[data-on]>*{
+  animation:rise 340ms var(--ease) backwards;
+}
+.screen[data-on]>*:nth-child(1){animation-delay:0ms}
+.screen[data-on]>*:nth-child(2){animation-delay:40ms}
+.screen[data-on]>*:nth-child(3){animation-delay:80ms}
+.screen[data-on]>*:nth-child(4){animation-delay:120ms}
+.screen[data-on]>*:nth-child(n+5){animation-delay:150ms}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition-duration:1ms!important}
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <header class="bar">
+    <h1 class="grow" id="title">Mapa</h1>
+    <button class="ib" id="theme" aria-label="Alternar tema" title="Alternar tema">
+      <svg viewBox="0 0 24 24" id="theme-ico" aria-hidden="true"></svg>
+    </button>
+    <button class="ib" id="back" aria-label="Voltar" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+  </header>
+
+  <main class="scroll" id="main">
+
+    <!-- ── MAPA ─────────────────────────────────────────────── -->
+    <section class="screen" data-s="mapa" data-on>
+      <div class="map">
+        <svg viewBox="0 0 320 400" role="img" aria-label="Mapa da região com academias e partners de treino">
+          <rect width="320" height="400" fill="var(--muted)"/>
+          <path d="M0 300 Q90 262 150 300 T320 286 L320 400 L0 400Z" fill="var(--blue-soft)"/>
+          <path d="M-10 96 H330" stroke="var(--border)" stroke-width="13"/>
+          <path d="M-10 214 H330" stroke="var(--border)" stroke-width="9"/>
+          <path d="M78 -10 V410" stroke="var(--border)" stroke-width="11"/>
+          <path d="M232 -10 V410" stroke="var(--border)" stroke-width="9"/>
+          <rect x="96" y="118" width="112" height="72" rx="8" fill="var(--surface-warm)" stroke="var(--accent-line)"/>
+          <text x="152" y="146" text-anchor="middle" font-size="9" font-weight="800" fill="var(--accent)" letter-spacing=".08em">ACADEMIA</text>
+          <text x="152" y="160" text-anchor="middle" font-size="9" font-weight="700" fill="var(--meta)">Studio · 300 m</text>
+          <circle cx="152" cy="176" r="3.5" fill="var(--accent)"/>
+          <g id="pins" font-size="9" font-weight="800"></g>
+        </svg>
+
+        <div class="map-tools">
+          <button class="ib" aria-label="Recentralizar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          </button>
+          <button class="ib" aria-label="Buscar nesta área">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          </button>
+        </div>
+
+        <div class="map-foot">
+          <button class="btn btn-p" id="treinar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9.5" cy="7" r="3.5"/><path d="M19 8l2 2 4-4"/></svg>
+            <span id="treinar-txt">Treinar Junto</span>
+          </button>
+        </div>
+      </div>
+
+      <h2 style="margin-top:var(--s5)">Perto de você agora</h2>
+      <p class="measure" style="font-size:var(--t-sm);color:var(--meta);margin-top:var(--s1)">
+        Distâncias aproximadas. Ninguém vê sua localização exata.
+      </p>
+
+      <div class="surface" style="margin-top:var(--s3)">
+        <button class="row" data-goto="chat" data-partner="Rafa Alencar" data-init="RA">
+          <span class="av av-2">RA</span>
+          <span><b>Rafa Alencar</b><small>Treinou há 2 h · Frontlever e barra</small></span>
+          <span class="tag">a 300 m</span>
+        </button>
+        <button class="row" data-goto="chat" data-partner="Júlia Okafor" data-init="JO">
+          <span class="av">JO</span>
+          <span><b>Júlia Okafor</b><small>Treinou ontem · Musculação</small></span>
+          <span class="dist num">a 1,2 km</span>
+        </button>
+        <button class="row" data-goto="avaliar">
+          <span class="av" style="background:var(--accent);color:var(--accent-on)">BT</span>
+          <span><b>Beto Tavares</b><small>Parceira Movase</small></span>
+          <span class="dist num">a 2 km</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── LISTA ────────────────────────────────────────────── -->
+    <section class="screen" data-s="lista">
+      <div class="seg" role="group" aria-label="Filtrar por modalidade">
+        <button aria-pressed="true">Todos</button>
+        <button aria-pressed="false">Musculação</button>
+        <button aria-pressed="false">Calistenia</button>
+        <button aria-pressed="false">Corrida</button>
+        <button aria-pressed="false">Ciclismo</button>
+      </div>
+
+      <h2 style="margin-top:var(--s5)">Vocês treinam com frequência parecida</h2>
+
+      <div class="surface" style="margin-top:var(--s3)">
+        <button class="row" data-goto="avaliar">
+          <span class="av av-2">RA</span>
+          <span>
+            <b>Rafa Alencar</b>
+            <small>Calistenia e musculação · treina 4×/semana</small>
+            <span class="tags">
+              <span class="tag">Ajuda nas cargas</span>
+              <span class="tag tag-blue">Pontual</span>
+            </span>
+          </span>
+          <span class="dist num">300 m</span>
+        </button>
+        <button class="row" data-goto="avaliar">
+          <span class="av">JO</span>
+          <span>
+            <b>Júlia Okafor</b>
+            <small>Rafa tem treinado mais que você recentemente</small>
+            <span class="tags"><span class="tag">Motivação</span></span>
+          </span>
+          <span class="dist num">1,2 km</span>
+        </button>
+        <button class="row" data-goto="avaliar">
+          <span class="av" style="background:var(--accent);color:var(--accent-on)">BT</span>
+          <span>
+            <b>Beto Tavares</b>
+            <small>Corrida e ciclismo · Parceira Fundadora</small>
+            <span class="tags"><span class="tag tag-blue">Foco total</span></span>
+          </span>
+          <span class="dist num">2 km</span>
+        </button>
+      </div>
+
+      <button class="btn btn-g btn-block" style="margin-top:var(--s4)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-7-10a7 7 0 1114 0c0 5.4-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+        Aumentar raio de busca
+      </button>
+    </section>
+
+    <!-- ── MATCHES ──────────────────────────────────────────── -->
+    <section class="screen" data-s="matches">
+      <div class="surface">
+        <button class="row" data-goto="chat" data-partner="Rafa Alencar" data-init="RA">
+          <span class="av av-2">RA</span>
+          <span><b>Rafa Alencar</b><small>Deu match! Diga oi</small></span>
+          <span class="tag">Deu Match!</span>
+        </button>
+        <button class="row" data-goto="chat" data-partner="Júlia Okafor" data-init="JO">
+          <span class="av">JO</span>
+          <span><b>Júlia Okafor</b><small>Deu match! Convidar para treinar</small></span>
+          <span class="dist num">ontem</span>
+        </button>
+      </div>
+
+      <button class="btn btn-p btn-block" style="margin-top:var(--s4)" data-goto="mapa">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-7-10a7 7 0 1114 0c0 5.4-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+        Explorar o mapa
+      </button>
+
+      <div class="surface" style="margin-top:var(--s6)">
+        <div class="row" style="grid-template-columns:1fr auto">
+          <span><b>Você ainda não recebeu avaliações</b><small>Treine com alguém do Movase e peça para avaliarem</small></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PEDIDOS ──────────────────────────────────────────── -->
+    <section class="screen" data-s="pedidos">
+      <div class="surface">
+        <div class="row">
+          <span class="av av-2">MC</span>
+          <span><b>Marina Costa</b><small>Quer treinar junto amanhã, 19h</small></span>
+          <span style="display:flex;gap:6px">
+            <button class="btn btn-p" style="min-height:36px;padding:0 14px;font-size:var(--t-sm)">Aceitar</button>
+            <button class="btn btn-g" style="min-height:36px;padding:0 14px;font-size:var(--t-sm)">Recusar</button>
+          </span>
+        </div>
+      </div>
+      <p style="font-size:var(--t-sm);color:var(--meta);margin-top:var(--s3)">
+        Não foi possível enviar o pedido? Tente novamente.
+      </p>
+    </section>
+
+    <!-- ── FAVORITOS ────────────────────────────────────────── -->
+    <section class="screen" data-s="favoritos">
+      <div class="surface">
+        <button class="row" data-goto="avaliar">
+          <span class="av" style="background:var(--accent);color:var(--accent-on)">BT</span>
+          <span><b>Beto Tavares</b><small>Corrida e ciclismo</small></span>
+          <span class="tag tag-blue">Parceira Movase</span>
+        </button>
+        <button class="row" data-goto="avaliar">
+          <span class="av">LF</span>
+          <span><b>Luísa Freitas</b><small>Yoga e alongamento</small></span>
+          <span class="dist num">3 km</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── CHECK-IN ─────────────────────────────────────────── -->
+    <section class="screen" data-s="checkin">
+      <h2>Treino de hoje</h2>
+      <p class="measure" style="font-size:var(--t-sm);color:var(--meta);margin-top:var(--s2)">
+        Registre o treino e leve seu card para os Stories.
+      </p>
+
+      <div class="seg" style="margin-top:var(--s4)" role="group" aria-label="Modalidade do treino">
+        <button aria-pressed="true">Musculação</button>
+        <button aria-pressed="false">Calistenia</button>
+        <button aria-pressed="false">Corrida</button>
+      </div>
+
+      <h3 style="margin-top:var(--s5)">Academia do dia (opcional)</h3>
+      <div class="surface" style="margin-top:var(--s2)">
+        <div class="row" style="grid-template-columns:1fr auto">
+          <span><b>Studio — Parq</b><small>Presença confirmada na academia</small></span>
+          <span class="tag">300 m</span>
+        </div>
+        <button class="row" style="grid-template-columns:1fr auto">
+          <span><b>Sem academia</b><small>Treinei em casa ou na rua</small></span>
+          <span class="dist">—</span>
+        </button>
+      </div>
+
+      <h3 style="margin-top:var(--s5)">Foto do treino (opcional)</h3>
+      <p style="font-size:var(--t-sm);color:var(--meta);margin-top:var(--s1)">
+        A foto não sai do seu aparelho: o card é montado aqui e vai direto para onde você escolher compartilhar.
+      </p>
+      <div class="surface" style="margin-top:var(--s2);display:grid;place-items:center;padding:var(--s8) var(--s4);text-align:center">
+        <svg viewBox="0 0 24 24" style="width:30px;height:30px;stroke:var(--fg-2);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round" aria-hidden="true">
+          <rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1.2-2h3.6L15 6"/>
+        </svg>
+        <p style="font-size:var(--t-sm);color:var(--meta);margin-top:var(--s2)">O card de hoje</p>
+      </div>
+
+      <button class="btn btn-p btn-block" style="margin-top:var(--s5)">Registrar treino</button>
+      <p style="font-size:var(--t-xs);color:var(--meta);margin-top:var(--s2);text-align:center">
+        O treino de hoje já estava registrado — o card continua disponível.
+      </p>
+    </section>
+
+    <!-- ── CHECK-IN FEITO ───────────────────────────────────── -->
+    <section class="screen" data-s="feito">
+      <div class="empty" style="padding-top:var(--s10)">
+        <svg viewBox="0 0 24 24" style="stroke:var(--accent)" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.6 2.6L16 9.5"/></svg>
+        <h2>Treino registrado!</h2>
+        <p>Treinei hoje! Bora treinar junto no Movase</p>
+      </div>
+
+      <div class="pass">
+        <div style="display:flex;align-items:center;gap:var(--s2)">
+          <span class="tag">Passe do Dia</span>
+          <span style="font-size:var(--t-xs);color:var(--meta);font-weight:700">1 treino grátis</span>
+        </div>
+        <b style="display:block;margin-top:var(--s2);font-size:var(--t-base)">2x1 — traga um acompanhante</b>
+        <code class="code">MOVASE-7K2Q</code>
+        <p style="font-size:var(--t-sm);color:var(--meta);margin-top:var(--s3)">
+          Mostre este código na recepção do Studio — Parq.
+        </p>
+      </div>
+
+      <button class="btn btn-p btn-block" style="margin-top:var(--s4)">Compartilhar card</button>
+      <button class="btn btn-g btn-block" style="margin-top:var(--s2)" data-goto="mapa">Voltar ao mapa</button>
+    </section>
+
+    <!-- ── AVALIAR ──────────────────────────────────────────── -->
+    <section class="screen" data-s="avaliar">
+      <h2>Como foi treinar com Rafa?</h2>
+
+      <h3 style="margin-top:var(--s5)">Nota (halteres)</h3>
+      <div class="stars" style="margin-top:var(--s2)" role="group" aria-label="Nota de 1 a 5">
+        <button aria-pressed="false" data-s="1" aria-label="1 halter"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg></button>
+        <button aria-pressed="false" data-s="2" aria-label="2 halteres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg></button>
+        <button aria-pressed="false" data-s="3" aria-label="3 halteres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg></button>
+        <button aria-pressed="false" data-s="4" aria-label="4 halteres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg></button>
+        <button aria-pressed="false" data-s="5" aria-label="5 halteres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg></button>
+      </div>
+
+      <h3 style="margin-top:var(--s5)">Badges (opcional)</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s2)">
+        <button class="chip" aria-pressed="false">Ajuda nas cargas</button>
+        <button class="chip" aria-pressed="false">Foco total</button>
+        <button class="chip" aria-pressed="false">Boa conversa</button>
+        <button class="chip" aria-pressed="false">Motivação</button>
+        <button class="chip" aria-pressed="false">Pontual</button>
+      </div>
+
+      <button class="btn btn-p btn-block" style="margin-top:var(--s6)" id="salvar" disabled>Avaliar treino</button>
+      <button class="btn btn-g btn-block" style="margin-top:var(--s2)" data-goto="matches">Voltar</button>
+    </section>
+
+  </main>
+
+  <nav class="tabs" aria-label="Navegação principal">
+    <button data-t="mapa" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3L3 6v15l6-3 6 3 6-3V3l-6 3z"/><path d="M9 3v15M15 6v15"/></svg>Mapa</button>
+    <button data-t="lista"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>Lista</button>
+    <button data-t="matches"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9.5" cy="7" r="3.5"/><path d="M19 8l2 2 4-4"/></svg>Matches</button>
+    <button data-t="pedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 8l2.5 11h13L21 8M9 8V5a3 3 0 016 0v3"/></svg>Pedidos</button>
+    <button data-t="favoritos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.6-7-10a7 7 0 1114 0c0 5.4-7 10-7 10z"/></svg>Favoritos</button>
+  </nav>
+</div>
+
+<script>
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+
+const TITLES = {
+  mapa:'Mapa', lista:'Lista', matches:'Meus matches', pedidos:'Pedidos',
+  favoritos:'Favoritos', checkin:'Treino de hoje', feito:'Treino registrado!', avaliar:'Avaliar treino',
+  chat:'Chat', convite:'Convidar para treinar'
+};
+const TABS = ['mapa','lista','matches','pedidos','favoritos','chat','convite'];
+let on = 'mapa', stack = [];
+
+/* ── tema: o token block é único, o toggle só move color-scheme ── */
+const SUN = '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>';
+const MOON = '<path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/>';
+function paintTheme(){
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme:dark)').matches;
+  $('#theme-ico').innerHTML = dark ? SUN : MOON;
+}
+$('#theme').addEventListener('click',()=>{
+  const cur = document.documentElement.dataset.theme
+    || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try{ localStorage.setItem('movase-theme', next); }catch{}
+  paintTheme();
+});
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',paintTheme);
+try{ const saved = localStorage.getItem('movase-theme'); if(saved) document.documentElement.dataset.theme = saved; }catch{}
+paintTheme();
+
+/* ── roteador ── */
+function go(next){
+  if(next !== on) stack.push(on);
+  const prev = on; on = next;
+  $$('.screen').forEach(s=>s.toggleAttribute('data-on', s.dataset.s === on));
+  $('#title').textContent = TITLES[on];
+  const tab = TABS.includes(on);
+  $$('.tabs button').forEach(b=> b.dataset.t === on ? b.setAttribute('aria-current','page') : b.removeAttribute('aria-current'));
+  $('#back').hidden = !stack.length;
+  $('#main').scrollTop = prev === on ? $('#main').scrollTop : 0;
+}
+$$('.tabs button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.t)));
+document.addEventListener('click',e=>{
+  const g = e.target.closest('[data-goto]');
+  if(g) go(g.dataset.goto);
+});
+$('#back').addEventListener('click',()=>{ if(stack.length) go(stack.pop()); });
+
+/* ── mapa: pins ── */
+const PINS = [[152,176,'RA','Rafa · 300 m','var(--accent)','#0A0A0A'],[64,120,'JO','Júlia · 1,2 km','var(--place-blue)','#FFF'],[258,232,'BT','Beto · 2 km','var(--place-blue)','#FFF'],[118,286,'LF','Luísa · 3 km','var(--place-blue)','#FFF']];
+$('#pins').innerHTML = PINS.map(([x,y,i,t,bg,fg],n)=>`
+  <g class="pin" data-n="${n}">
+    <path d="M${x} ${y+26}c0 0 13-13.5 13-21a13 13 0 10-26 0c0 7.5 13 21 13 21z" fill="${bg}"/>
+    <circle cx="${x}" cy="${y+5}" r="9.5" fill="${bg}"/>
+    <text x="${x}" y="${y+8.5}" text-anchor="middle" font-size="10" fill="${fg}">${i}</text>
+  </g>`).join('');
+$$('.pin').forEach(p=>p.addEventListener('click',()=>go('avaliar')));
+
+/* ── Treinar Junto: o momento autoral ── */
+let sent = false;
+$('#treinar').addEventListener('click',e=>{
+  const b = e.currentTarget;
+  if(sent) return;
+  sent = true;
+  b.setAttribute('aria-busy','true');
+  $('#treinar-txt').textContent = 'Enviando…';
+  setTimeout(()=>{
+    b.removeAttribute('aria-busy');
+    $('#treinar-txt').textContent = 'Pedido enviado ✓';
+    $('.map-foot').animate(
+      [{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(0)'}],
+      {duration:320, easing:'cubic-bezier(.32,.72,0,1)'});
+  },520);
+  setTimeout(()=>{ sent = false; $('#treinar-txt').textContent = 'Treinar Junto'; },3400);
+});
+
+/* ── segmentados ── */
+$$('.seg').forEach(g=>g.addEventListener('click',e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  $$('button',g).forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+}));
+
+/* ── avaliar ── */
+$$('.stars button').forEach(b=>b.addEventListener('click',()=>{
+  const n = +b.dataset.s;
+  $$('.stars button').forEach(x=>x.setAttribute('aria-pressed', String(+x.dataset.s <= n)));
+  $('#salvar').disabled = false;
+}));
+$$('.chip').forEach(c=>c.addEventListener('click',()=>
+  c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') !== 'true')));
+$('#salvar').addEventListener('click',e=>{
+  const b = e.currentTarget, t = b.textContent;
+  b.textContent = 'Salvo ✓'; b.disabled = true;
+  setTimeout(()=>go('matches'),900);
+  setTimeout(()=>{ b.textContent = t; }, 1600);
+});
+</script>
+</body>
+</html>
+<script>document.addEventListener('DOMContentLoaded',()=>{
+  const h = location.hash.replace('#','');
+  if (h && document.querySelector(`.screen[data-s="${h}"]`)) {
+    document.querySelectorAll('.screen').forEach(s => s.toggleAttribute('data-on', s.dataset.s === h));
+    const tab = ['mapa','lista','matches','pedidos','favoritos','chat','convite'].includes(h);
+    document.querySelectorAll('.tabs button').forEach(b => b.toggleAttribute('aria-current', b.dataset.t === h));
+    document.getElementById('title').textContent = TITLES[h] || h;
+  }
+});</script>
