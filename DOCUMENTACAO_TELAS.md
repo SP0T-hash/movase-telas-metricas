@@ -176,3 +176,24 @@ Implementação atual: majoritariamente visual/textual (client-side). Em app nat
 - Protótipos HTML não possuem backend (auth, matches realtime, servidor de atividades). Apenas UI + lógica client-side.
 - MapLibre usa tiles demo (https://demotiles.maplibre.org/style.json) — para produção usar estilo próprio + chaves válidas.
 - Simulações (métricas parceiro) são apenas para demonstração visual.
+
+## 7. movase-loading.html (Nova)
+Tela de splash/loading com identidade Movase.
+
+### Comportamento
+- Exibe logo animado (fade-in pop + bounce sutil). Pulsos circulares em torno da logo (3 camadas) simulam respiração/feedback.
+- Barra de progresso animada (shimmer) com duração ~1.8s.
+- Texto "Abrindo Movase…" com pulsação suave.
+- Transição de saída: fade-out + leve scale ao finalizar carregamento (280ms).
+- Auto-avanço após 1600ms → redireciona para `movase-app.html`.
+- Interação: clique ou tecla Enter/Espaço também avançam imediatamente.
+- Acessibilidade/redução de movimento: `prefers-reduced-motion` desativa animações e mantém entrada suave.
+- Suporte light/dark via tokens `--bg`, `--fg`, `--accent`, `--surface-warm`.
+
+### Uso
+- Pode ser definida como tela inicial (splash) do app nativo/web. Em Xcode, integrar como LaunchScreen/storyboard ou exibir esta view antes de carregar rotas.
+- Redirecionamento pode ser ajustado para rota desejada (ex.: `movase-treino-mapbox.html#mapa`).
+
+### Assets
+- `assets/logo-movase.png` — logo Movase utilizada (copiado de `movase-run-mobile.png`).
+
