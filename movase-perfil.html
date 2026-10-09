@@ -4,23 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>Movase — Perfil</title>
+<title>Movase — Perfil de treino</title>
 <style>
-/* Tokens: mesmos de movase-app.html (theme.json do app). Ver design-system.md. */
+/* Tokens do design system Movase (design-system.md, theme.json do app).
+   accent-on usa #0A0A0A por AA (contrato #FFFFFF = 2.59:1). */
 :root{
   color-scheme:light;
   --accent:#F58220; --accent-on:#0A0A0A; --accent-text:light-dark(#8A3F08,#F58220);
+  --accent-soft:light-dark(rgba(245,130,32,.13),rgba(245,130,32,.18));
   --bg:light-dark(#FFFFFF,#0C0A09); --fg:light-dark(#0A0A0A,#FAFAF9);
   --fg-2:light-dark(#57534E,#A8A29E); --meta:light-dark(#57534E,#A8A29E);
   --muted:light-dark(#F5F5F4,#1C1917); --surface:light-dark(#F5F5F4,#1C1917);
   --surface-warm:light-dark(#FFF4E8,#2A1A0C); --border:light-dark(#E7E5E4,#292524);
   --place-blue:light-dark(#003399,#7DA7FF); --blue-soft:light-dark(rgba(0,51,153,.09),rgba(125,167,255,.14));
-  --accent-soft:light-dark(rgba(245,130,32,.13),rgba(245,130,32,.18));
-  --accent-line:light-dark(rgba(245,130,32,.34),rgba(245,130,32,.42));
-  --shadow-pop:0 2px 6px rgba(12,10,9,.06),0 18px 40px -14px rgba(12,10,9,.2);
   --r-sm:8px; --r-md:20px; --r-pill:9999px;
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px;
-  --t-xs:11.5px; --t-sm:13px; --t-base:15px; --t-lg:19px; --t-2xl:32px;
+  --t-xs:12px; --t-sm:13px; --t-base:15px; --t-lg:19px; --t-xl:27px;
   --sans:Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
   --ease:cubic-bezier(.23,1,.32,1);
 }
@@ -36,23 +35,21 @@ button,input,textarea{font:inherit;color:inherit}
 button{border:0;background:none;cursor:pointer}
 svg{display:block}
 h1,h2,h3,p{margin:0}
-h1{font-size:var(--t-2xl);line-height:1.1;font-weight:800;letter-spacing:-.022em}
-h2{font-size:var(--t-lg);line-height:1.2;font-weight:800;letter-spacing:-.015em}
-h3{font-size:var(--t-base);line-height:1.3;font-weight:700}
+h1{font-size:var(--t-xl);line-height:1.1;font-weight:900;letter-spacing:-.02em}
+h2{font-size:var(--t-sm);line-height:1.2;font-weight:800;letter-spacing:.085em;text-transform:uppercase;color:var(--fg-2)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
-.phone{width:100%;max-width:430px;min-height:100dvh;background:var(--bg);display:grid;grid-template-rows:auto 1fr auto;position:relative;box-shadow:var(--shadow-pop)}
-@media (min-width:480px){.phone{margin:24px 0;border-radius:var(--r-md);overflow:clip;min-height:calc(100dvh - 48px)}}
+.phone{width:100%;max-width:430px;min-height:100dvh;background:var(--bg);display:grid;grid-template-rows:auto 1fr auto;position:relative}
+@media (min-width:480px){.phone{margin:24px 0;border-radius:var(--r-md);overflow:clip;min-height:calc(100dvh - 48px);box-shadow:0 18px 40px -14px rgba(12,10,9,.2)}}
 
 .bar{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-bottom:1px solid var(--border);background:var(--bg)}
-.bar .grow{flex:1;min-width:0}
+.bar .grow{flex:1;min-width:0;font-size:var(--t-lg);font-weight:800;letter-spacing:-.015em}
 .ib{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:var(--r-pill);color:var(--fg);transition:background-color 160ms var(--ease),transform 140ms var(--ease)}
 .ib:hover{background:var(--muted)}
 .ib:active{transform:scale(.94)}
 .ib svg{width:21px;height:21px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
-.scroll{overflow-y:auto;overscroll-behavior:contain;padding:var(--s4) var(--s4) var(--s8)}
+.scroll{overflow-y:auto;overscroll-behavior:contain;padding:0 var(--s4) var(--s8)}
 .screen{display:none}
 .screen[data-on]{display:block}
 
@@ -65,92 +62,94 @@ h3{font-size:var(--t-base);line-height:1.3;font-weight:700}
 .btn-g:hover{border-color:var(--fg-2)}
 .btn-block{width:100%}
 .btn-sm{min-height:36px;padding:0 var(--s4);font-size:var(--t-sm)}
+.link{min-height:44px;padding:0 var(--s2);color:var(--accent-text);font-weight:800;font-size:var(--t-sm)}
 
-/* cabeçalho do perfil */
-.hero{display:grid;grid-template-columns:88px 1fr;gap:var(--s4);align-items:center}
-.avatar{position:relative;width:88px;height:88px;border-radius:var(--r-pill);display:grid;place-items:center;font-size:var(--t-xl,25px);font-weight:800;color:light-dark(#fff,#0A0A0A);background:var(--place-blue)}
-.avatar.has-photo{background:var(--muted);color:var(--fg)}
-.avatar .edit{position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:var(--r-pill);display:grid;place-items:center;background:var(--accent);color:var(--accent-on);border:3px solid var(--bg)}
-.avatar .edit svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.hero h1{font-size:var(--t-xl,25px);letter-spacing:-.02em}
-.meta{color:var(--meta);font-size:var(--t-sm)}
-.chips{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s2)}
-.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r-pill);background:var(--surface-warm);color:var(--accent-text);font-size:var(--t-xs);font-weight:800;white-space:nowrap}
-.tag-blue{background:var(--blue-soft);color:var(--place-blue)}
-.tag-muted{background:var(--muted);color:var(--fg-2)}
+/* ── cabeçalho: identidade de treino, sem cartão ── */
+.head{display:grid;grid-template-columns:64px 1fr;gap:var(--s4);align-items:center;padding:var(--s5) 0 var(--s4)}
+.av{width:64px;height:64px;border-radius:var(--r-pill);display:grid;place-items:center;font-size:var(--t-lg);font-weight:800;color:light-dark(#fff,#0A0A0A);background:var(--place-blue);position:relative}
+.av.me{background:var(--accent);color:var(--accent-on)}
+.verified{position:absolute;right:-4px;bottom:-4px;width:24px;height:24px;border-radius:var(--r-pill);background:var(--place-blue);color:light-dark(#fff,#0A0A0A);display:grid;place-items:center;border:2px solid var(--bg)}
+.verified svg{width:12px;height:12px;stroke:currentColor;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sub{color:var(--meta);font-size:var(--t-sm);margin-top:var(--s1)}
+.status{display:inline-flex;align-items:center;gap:6px;margin-top:var(--s2);font-size:var(--t-sm);font-weight:700;color:var(--fg)}
+.status i{width:8px;height:8px;border-radius:var(--r-pill);background:var(--accent)}
 
-/* completude */
-.complete{margin-top:var(--s5);padding:var(--s4);border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg)}
-.complete-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3)}
-.bar-track{height:6px;border-radius:var(--r-pill);background:var(--muted);margin-top:var(--s3);overflow:hidden}
-.bar-fill{height:100%;width:100%;background:var(--accent);border-radius:var(--r-pill);transform-origin:left;transition:transform 320ms var(--ease)}
-.next{margin-top:var(--s3);font-size:var(--t-sm);color:var(--fg-2)}
-.next b{color:var(--fg)}
+/* ── números de confiança ── */
+.trust{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.trust div{padding:var(--s4) 0}
+.trust div+div{padding-left:var(--s4);border-left:1px solid var(--border)}
+.num-big{font-size:28px;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.trust small{display:block;margin-top:var(--s2);font-size:var(--t-xs);color:var(--meta);font-weight:700;letter-spacing:.02em}
+.empty-trust{font-size:var(--t-sm);color:var(--meta)}
 
-/* seções */
-.section{margin-top:var(--s6)}
-.section-head{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);margin-bottom:var(--s3)}
-.section-head p{font-size:var(--t-sm);color:var(--meta);margin-top:2px}
-.card{border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);overflow:clip}
-.card+.card{margin-top:var(--s3)}
-.row{display:grid;grid-template-columns:1fr auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4)}
-.row+.row{border-top:1px solid var(--border)}
-.row b{display:block;font-weight:700}
-.row small{display:block;font-size:var(--t-sm);color:var(--meta);line-height:1.35}
+/* ── blocos: divisórias, não cartões ── */
+.block{padding:var(--s5) 0;border-bottom:1px solid var(--border)}
+.block-h{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);margin-bottom:var(--s3)}
+.dl{display:grid;grid-template-columns:112px 1fr;gap:var(--s2) var(--s3);font-size:var(--t-sm)}
+.dl dt{color:var(--meta);font-weight:700}
+.dl dd{margin:0;font-weight:700;color:var(--fg)}
+.dl dd.hidden-v{color:var(--meta);font-style:italic;font-weight:600}
+.quote{font-size:var(--t-lg);line-height:1.4;font-weight:700;letter-spacing:-.01em}
+.hint{font-size:var(--t-sm);color:var(--meta);margin-top:var(--s2)}
+.ok{color:var(--place-blue);font-weight:800}
 
-/* toggle de privacidade */
-.switch{position:relative;width:48px;height:28px;border-radius:var(--r-pill);background:var(--border);transition:background-color 180ms var(--ease);flex:0 0 48px}
-.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:var(--r-pill);background:#fff;transition:transform 220ms var(--ease);box-shadow:0 1px 2px rgba(0,0,0,.2)}
-.switch[aria-checked=true]{background:var(--accent)}
-.switch[aria-checked=true]::after{transform:translateX(20px)}
-.vis{display:inline-flex;gap:2px;padding:2px;border-radius:var(--r-pill);background:var(--muted);font-size:var(--t-xs);font-weight:800}
-.vis button{min-height:28px;padding:0 10px;border-radius:var(--r-pill);color:var(--fg-2)}
-.vis button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-
-/* segmentado */
-.seg{display:flex;gap:4px;padding:3px;background:var(--muted);border-radius:var(--r-pill);overflow-x:auto;scrollbar-width:none}
-.seg::-webkit-scrollbar{display:none}
-.seg button{flex:1 0 auto;min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);font-weight:700;color:var(--meta);white-space:nowrap}
-.seg button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.chip{min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);border:1.5px solid var(--border);font-size:var(--t-sm);font-weight:700;color:var(--fg-2);transition:transform 160ms var(--ease)}
-.chip:active{transform:scale(.96)}
-.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-text)}
-
-/* campos */
-.field{display:grid;gap:var(--s2);margin-top:var(--s4)}
-.field label,.label{font-size:var(--t-sm);font-weight:700}
-.input,.textarea{width:100%;min-height:44px;padding:10px var(--s4);border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);font-size:var(--t-base)}
-.textarea{min-height:88px;resize:vertical}
-.input:focus,.textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.count{justify-self:end;font-size:var(--t-xs);color:var(--meta)}
-.count.over{color:#B42318;font-weight:800}
-.hint{font-size:var(--t-sm);color:var(--meta)}
-
-/* músicas */
-.track{display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4)}
+/* ── trilha ── */
+.track{display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center;padding:var(--s2) 0}
 .track+.track{border-top:1px solid var(--border)}
 .cover{width:44px;height:44px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--surface-warm);color:var(--accent-text);font-weight:800;font-size:var(--t-sm)}
-img.cover{object-fit:cover;padding:0}
+img.cover{object-fit:cover}
 .track b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track small{display:block;color:var(--meta);font-size:var(--t-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .star{min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:var(--r-pill);color:var(--fg-2)}
 .star[aria-pressed=true]{color:var(--accent)}
 .star svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linejoin:round}
 .star[aria-pressed=true] svg{fill:currentColor}
-.rm{min-height:36px;padding:0 var(--s3);border-radius:var(--r-pill);color:var(--fg-2);font-size:var(--t-sm);font-weight:700}
+.rm{min-height:36px;padding:0 var(--s2);border-radius:var(--r-pill);color:var(--fg-2);font-size:var(--t-sm);font-weight:700}
 .rm:hover{color:#B42318}
-.empty{padding:var(--s5) var(--s4);text-align:center;color:var(--meta);font-size:var(--t-sm)}
-.results{margin-top:var(--s2)}
-.results .track{padding:var(--s2) var(--s3)}
-.notice{padding:var(--s3) var(--s4);border-radius:var(--r-sm);background:var(--blue-soft);color:var(--place-blue);font-size:var(--t-sm);font-weight:600}
+.tag{display:inline-block;font-size:var(--t-xs);font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-text)}
+.empty{padding:var(--s4) 0;color:var(--meta);font-size:var(--t-sm)}
 
-/* pré-visualização */
-.preview-note{padding:var(--s3) var(--s4);border-radius:var(--r-sm);background:var(--muted);color:var(--fg-2);font-size:var(--t-sm);margin-bottom:var(--s4)}
-.hidden-field{font-style:italic;color:var(--fg-2)}
+/* ── segmentado / chips ── */
+.seg{display:flex;gap:4px;padding:3px;background:var(--muted);border-radius:var(--r-pill);overflow-x:auto;scrollbar-width:none;margin:var(--s4) 0}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);font-weight:700;font-size:var(--t-sm);color:var(--meta);white-space:nowrap}
+.seg button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.chip{min-height:40px;padding:0 var(--s4);border-radius:var(--r-pill);border:1.5px solid var(--border);font-size:var(--t-sm);font-weight:700;color:var(--fg-2);transition:transform 160ms var(--ease)}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-text)}
+.chip.place[aria-pressed=true]{border-color:var(--place-blue);background:var(--blue-soft);color:var(--place-blue)}
 
-.savebar{position:sticky;bottom:0;padding:var(--s3) var(--s4) calc(var(--s3) + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--border);display:flex;gap:var(--s2)}
+/* ── formulários ── */
+.field{display:grid;gap:var(--s2);margin-top:var(--s4)}
+.field label,.label{font-size:var(--t-sm);font-weight:700}
+.input,.textarea,.select{width:100%;min-height:44px;padding:10px var(--s4);border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);font-size:var(--t-base)}
+.select{appearance:none;-webkit-appearance:none;padding-right:40px;background:var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%2357534E' stroke-width='2' fill='none' stroke-linecap='round'/></svg>") no-repeat right 14px center}
+.textarea{min-height:88px;resize:vertical}
+.input:focus,.textarea:focus,.select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.count{justify-self:end;font-size:var(--t-xs);color:var(--meta)}
+.count.over{color:#B42318;font-weight:800}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.check{display:flex;gap:var(--s3);align-items:flex-start;font-size:var(--t-sm);color:var(--fg-2);margin-top:var(--s3)}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent)}
+
+.switch{position:relative;width:48px;height:28px;border-radius:var(--r-pill);background:var(--border);transition:background-color 180ms var(--ease);flex:0 0 48px}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:var(--r-pill);background:#fff;transition:transform 220ms var(--ease);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch[aria-checked=true]{background:var(--accent)}
+.switch[aria-checked=true]::after{transform:translateX(20px)}
+.vis{display:inline-flex;gap:2px;padding:2px;border-radius:var(--r-pill);background:var(--muted);font-size:var(--t-xs);font-weight:800;flex-wrap:wrap}
+.vis button{min-height:32px;padding:0 10px;border-radius:var(--r-pill);color:var(--fg-2)}
+.vis button[aria-pressed=true]{background:var(--bg);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.prow{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--border)}
+.prow:first-child{border-top:0}
+.prow b{display:block;font-weight:700}
+.prow small{color:var(--meta);font-size:var(--t-sm)}
+
+.search-src{font-size:var(--t-xs);color:var(--meta);margin-top:var(--s2)}
+.results{margin-top:var(--s2);border-top:1px solid var(--border)}
+.savebar{position:sticky;bottom:0;padding:var(--s4) var(--s4) calc(var(--s4) + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--border);display:flex;gap:var(--s2)}
 .savebar .btn{flex:1}
-.toast{position:fixed;left:50%;bottom:calc(var(--s8) + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(12px);opacity:0;background:var(--fg);color:var(--bg);padding:10px var(--s4);border-radius:var(--r-pill);font-size:var(--t-sm);font-weight:700;transition:opacity 200ms var(--ease),transform 200ms var(--ease);pointer-events:none}
+.toast{position:fixed;left:50%;bottom:calc(var(--s8) + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(12px);opacity:0;background:var(--fg);color:var(--bg);padding:10px var(--s4);border-radius:var(--r-pill);font-size:var(--t-sm);font-weight:700;transition:opacity 200ms var(--ease),transform 200ms var(--ease);pointer-events:none;max-width:90vw;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:1ms!important;animation-duration:1ms!important}}
@@ -162,7 +161,7 @@ img.cover{object-fit:cover;padding:0}
     <button class="ib" id="back" aria-label="Voltar" hidden>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
     </button>
-    <h1 class="grow" id="title" style="font-size:var(--t-lg)">Perfil</h1>
+    <h1 class="grow" id="title">Meu treino</h1>
     <button class="ib" id="theme" aria-label="Alternar tema">
       <svg viewBox="0 0 24 24" aria-hidden="true" id="theme-ico"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
     </button>
@@ -170,284 +169,361 @@ img.cover{object-fit:cover;padding:0}
 
   <main class="scroll" id="main">
 
-    <!-- ══════════════ PERFIL (visão do próprio usuário) ══════════════ -->
+    <!-- ══════════ PERFIL (o próprio usuário) ══════════ -->
     <section class="screen" data-s="perfil" data-on>
-      <div class="hero">
-        <div class="avatar" id="avatar" aria-hidden="true">
-          <span id="initials">VC</span>
-          <button class="edit" aria-label="Trocar foto" data-goto="fotos"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+      <div class="head">
+        <div class="av me" id="avatar" aria-hidden="true"><span id="initials">VC</span>
+          <span class="verified" id="verifiedBadge" hidden title="Perfil verificado"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span>
         </div>
         <div>
           <h1 id="pName">Você</h1>
-          <p class="meta" id="pSub">Corrida · Musculação · Intermediário</p>
-          <div class="chips">
-            <span class="tag">Treina ter/qui 19h</span>
-            <span class="tag tag-blue">Bairro oculto</span>
-          </div>
+          <p class="sub" id="pSub">Corrida · Musculação · Intermediário</p>
+          <p class="status" id="pStatus"><i aria-hidden="true"></i>Pronto para treinar</p>
         </div>
       </div>
 
-      <div class="complete" aria-live="polite">
-        <div class="complete-head">
-          <h2 style="font-size:var(--t-base)">Perfil completo</h2>
-          <span class="meta num" id="pctText">4 de 6</span>
+      <div class="trust" aria-label="Confiança">
+        <div>
+          <span class="num-big" id="statDone">0</span>
+          <small>treinos juntos concluídos</small>
         </div>
-        <div class="bar-track" role="progressbar" aria-label="Completude do perfil" aria-valuemin="0" aria-valuemax="100" aria-valuenow="67">
-          <div class="bar-fill" id="pctBar" style="transform:scaleX(.67)"></div>
-        </div>
-        <p class="next" id="nextStep">Próximo passo: <b>adicione 2 prompts</b> para abrir conversa com parceiros.</p>
-      </div>
-
-      <div class="section">
-        <div class="section-head">
-          <div><h2>Música para treinar</h2><p id="trackCount">3 de 20 músicas · 2 destaques</p></div>
-          <button class="btn btn-g btn-sm" data-goto="musica">Gerenciar</button>
-        </div>
-        <div class="card" id="pTracks"></div>
-      </div>
-
-      <div class="section">
-        <div class="section-head"><div><h2>Sobre</h2></div><button class="btn btn-g btn-sm" data-goto="editar">Editar perfil</button></div>
-        <div class="card">
-          <div class="row"><div><b>Bio</b><small id="pBio">Gosto de treinar cedo, corrida leve e carga moderada.</small></div></div>
-          <div class="row"><div><b>Metas</b><small>Correr 10 km sem parar · 3 treinos por semana</small></div></div>
-          <div class="row"><div><b>Interesses</b><small>Corrida de rua · Yoga · Nutrição · Ciclismo</small></div></div>
+        <div>
+          <span class="num-big" id="statRating">—</span>
+          <small id="statRatingSub">sem avaliações ainda</small>
         </div>
       </div>
+      <p class="empty-trust" id="trustEmpty" style="margin-top:var(--s3)">Ainda sem treinos juntos. Sua primeira presença aparece aqui.</p>
 
-      <div class="section">
-        <div class="section-head"><div><h2>Privacidade</h2><p>Você escolhe o que outros treinos veem.</p></div></div>
-        <div class="card" id="privacyPreview"></div>
-        <button class="btn btn-g btn-block" style="margin-top:var(--s4)" data-goto="ver">Ver como outros treinos me veem</button>
+      <section class="block">
+        <div class="block-h"><h2>Treino</h2><button class="link" data-goto="treino">Editar</button></div>
+        <dl class="dl" id="trainDl"></dl>
+      </section>
+
+      <section class="block">
+        <div class="block-h"><h2>Frase</h2><button class="link" data-goto="sobre">Editar</button></div>
+        <p class="quote" id="pPhrase"></p>
+      </section>
+
+      <section class="block" id="goalBlock">
+        <div class="block-h"><h2>Meta</h2><button class="link" data-goto="sobre">Editar</button></div>
+        <p id="pGoal"></p>
+      </section>
+
+      <section class="block">
+        <div class="block-h"><h2>Trilha de treino</h2><button class="link" data-goto="trilha">Gerenciar</button></div>
+        <div id="pTracks"></div>
+        <p class="hint" id="trackCount"></p>
+      </section>
+
+      <section class="block">
+        <div class="block-h"><h2>Segurança</h2><button class="link" data-goto="seguranca">Gerenciar</button></div>
+        <dl class="dl">
+          <dt>Verificação</dt><dd id="pVerify">Não verificado</dd>
+          <dt>Contato de confiança</dt><dd id="pContact">Não configurado</dd>
+        </dl>
+      </section>
+
+      <div style="display:grid;gap:var(--s2);margin-top:var(--s5)">
+        <button class="btn btn-p btn-block" data-goto="treino">Editar perfil</button>
+        <button class="btn btn-g btn-block" data-goto="ver">Ver como outros treinos me veem</button>
       </div>
     </section>
 
-    <!-- ══════════════ VER COMO (pré-visualização pública) ══════════════ -->
+    <!-- ══════════ VER COMO (pré-visualização pública) ══════════ -->
     <section class="screen" data-s="ver">
-      <p class="preview-note">Pré-visualização: é assim que outro treino vê seu perfil. Campos ocultos aparecem como "oculto".</p>
-      <div class="hero">
-        <div class="avatar" aria-hidden="true"><span id="vInitials">VC</span></div>
+      <p class="hint" style="margin-top:var(--s4)">Pré-visualização. Campos restritos aparecem como “oculto”.</p>
+      <div class="head">
+        <div class="av" aria-hidden="true"><span id="vInitials">VC</span></div>
         <div>
           <h1 id="vName">Você</h1>
-          <p class="meta">Distância aproximada: <span id="vDist">até 1 km</span></p>
+          <p class="sub">Distância: <span id="vDist">até 1 km</span></p>
         </div>
       </div>
-      <div class="section">
-        <h2>Música para treinar</h2>
-        <div class="card" id="vTracks" style="margin-top:var(--s3)"></div>
+      <dl class="dl" style="padding:var(--s4) 0;border-bottom:1px solid var(--border)" id="vDl"></dl>
+      <section class="block">
+        <div class="block-h"><h2>Trilha</h2></div>
+        <div id="vTracks"></div>
+      </section>
+      <section class="block">
+        <div class="block-h"><h2>Histórico com parceiros</h2></div>
+        <p id="vHist" class="empty"></p>
+      </section>
+      <div style="display:grid;gap:var(--s2);margin-top:var(--s5)">
+        <button class="btn btn-g btn-block" id="fakeReport">Denunciar perfil</button>
+        <button class="btn btn-g btn-block" id="fakeBlock">Bloquear</button>
+        <button class="btn btn-p btn-block" data-goto="perfil">Voltar ao meu perfil</button>
       </div>
-      <div class="section">
-        <h2>Disponibilidade</h2>
-        <div class="card" style="margin-top:var(--s3)"><div class="row"><div><b id="vAvail">Ter e qui, 19h–21h</b></div></div></div>
-      </div>
-      <div class="section">
-        <h2>Prompts</h2>
-        <div class="card" style="margin-top:var(--s3)">
-          <div class="row"><div><b>Meu treino ideal é</b><small>Correr cedo, sem pressa de chegar ao fim.</small></div></div>
-        </div>
-      </div>
-      <div class="section">
-        <h2>Histórico de treinos</h2>
-        <div class="card" style="margin-top:var(--s3)"><div class="empty" id="vHist">Oculto pelo usuário.</div></div>
-      </div>
-      <button class="btn btn-p btn-block" style="margin-top:var(--s6)" data-goto="perfil">Voltar para meu perfil</button>
     </section>
 
-    <!-- ══════════════ EDITAR (seções) ══════════════ -->
-    <section class="screen" data-s="editar">
-      <div class="seg" role="tablist" aria-label="Seções do perfil">
-        <button aria-pressed="true" data-go="editar">Básico</button>
-        <button aria-pressed="false" data-go="musica">Música</button>
-        <button aria-pressed="false" data-go="treino">Treino</button>
-        <button aria-pressed="false" data-go="fotos">Fotos</button>
+    <!-- ══════════ TREINO ══════════ -->
+    <section class="screen" data-s="treino">
+      <div class="seg" role="group" aria-label="Seções">
+        <button aria-pressed="true" data-go="treino">Treino</button>
+        <button aria-pressed="false" data-go="trilha">Trilha</button>
+        <button aria-pressed="false" data-go="sobre">Sobre</button>
         <button aria-pressed="false" data-go="privacidade">Privacidade</button>
+        <button aria-pressed="false" data-go="seguranca">Segurança</button>
       </div>
-
-      <div class="field">
-        <label for="fName">Nome de exibição</label>
-        <input class="input" id="fName" maxlength="40" value="Você" autocomplete="name">
-      </div>
-      <div class="field">
-        <label for="fBio">Bio</label>
-        <textarea class="textarea" id="fBio" maxlength="300" aria-describedby="bioCount">Gosto de treinar cedo, corrida leve e carga moderada.</textarea>
-        <span class="count" id="bioCount">58/300</span>
-      </div>
-      <div class="field">
-        <label for="fCity">Cidade e bairro aproximado</label>
-        <input class="input" id="fCity" value="São Paulo · Pinheiros">
-        <span class="hint">Outros veem só a distância aproximada, nunca seu endereço.</span>
-      </div>
+      <div class="field" style="margin-top:0"><span class="label">Modalidades</span>
+        <div class="chips" id="sports"></div></div>
+      <div class="field"><span class="label">Nível</span>
+        <div class="chips" id="levels"></div></div>
+      <div class="field"><span class="label">Ritmo de referência</span>
+        <div class="row2">
+          <input class="input" id="pace" value="5:30" aria-describedby="paceHint" inputmode="numeric" maxlength="5">
+          <input class="input" value="min/km" aria-label="Unidade" disabled>
+        </div>
+        <span class="hint" id="paceHint">Usado para sugerir corrida com ritmo parecido. Opcional.</span></div>
+      <div class="field"><span class="label">Dias</span>
+        <div class="chips" id="days"></div></div>
+      <div class="field"><span class="label">Horário</span>
+        <div class="row2">
+          <select class="select" id="from" aria-label="Início"></select>
+          <select class="select" id="to" aria-label="Fim"></select>
+        </div></div>
+      <div class="field"><span class="label">Bairro aproximado</span>
+        <input class="input" id="neigh" value="Pinheiros" maxlength="40" aria-describedby="neighHint">
+        <span class="hint" id="neighHint">Outros veem só a faixa de distância, nunca seu endereço.</span></div>
     </section>
 
-    <section class="screen" data-s="musica">
-      <div class="section-head" style="margin-top:0">
-        <div><h2>Música para treinar</h2><p id="mCount">0 de 20 · 0 destaques (máx. 3)</p></div>
+    <!-- ══════════ TRILHA ══════════ -->
+    <section class="screen" data-s="trilha">
+      <div class="seg" role="group" aria-label="Seções">
+        <button aria-pressed="false" data-go="treino">Treino</button>
+        <button aria-pressed="true" data-go="trilha">Trilha</button>
+        <button aria-pressed="false" data-go="sobre">Sobre</button>
+        <button aria-pressed="false" data-go="privacidade">Privacidade</button>
+        <button aria-pressed="false" data-go="seguranca">Segurança</button>
       </div>
       <div class="field" style="margin-top:0">
         <label for="q">Buscar música</label>
         <input class="input" id="q" type="search" placeholder="Música ou artista" autocomplete="off">
-        <span class="hint" id="searchSource">Digite para buscar músicas no Spotify. Você não precisa de conta Spotify.</span>
+        <span class="search-src" id="searchSource">Você não precisa de conta Spotify para escolher.</span>
       </div>
-      <div class="card results" id="results" hidden></div>
-      <div class="section" style="margin-top:var(--s5)">
-        <h3 style="margin-bottom:var(--s2)">Sua lista</h3>
-        <div class="card" id="myTracks"></div>
-        <p class="hint" style="margin-top:var(--s3)">Toque na estrela para destacar até 3 músicas no seu perfil.</p>
+      <div id="results" class="results" hidden></div>
+      <div style="margin-top:var(--s5)">
+        <div class="block-h"><h2 id="mCount">Sua trilha</h2></div>
+        <div id="myTracks"></div>
+        <p class="hint">Até 20 faixas. Até 3 destaques aparecem no seu perfil. Destaques valem para todos os treinos.</p>
       </div>
     </section>
 
-    <section class="screen" data-s="treino">
+    <!-- ══════════ SOBRE ══════════ -->
+    <section class="screen" data-s="sobre">
+      <div class="seg" role="group" aria-label="Seções">
+        <button aria-pressed="false" data-go="treino">Treino</button>
+        <button aria-pressed="false" data-go="trilha">Trilha</button>
+        <button aria-pressed="true" data-go="sobre">Sobre</button>
+        <button aria-pressed="false" data-go="privacidade">Privacidade</button>
+        <button aria-pressed="false" data-go="seguranca">Segurança</button>
+      </div>
       <div class="field" style="margin-top:0">
-        <span class="label">Modalidades</span>
-        <div class="chips" id="sports" style="margin-top:0"></div>
+        <label for="fName">Nome de exibição</label>
+        <input class="input" id="fName" maxlength="40" value="Você" autocomplete="name">
       </div>
       <div class="field">
-        <span class="label">Nível</span>
-        <div class="seg" role="group" aria-label="Nível"><button aria-pressed="false">Iniciante</button><button aria-pressed="true">Intermediário</button><button aria-pressed="false">Avançado</button></div>
+        <label for="fPhrase">Frase de treino</label>
+        <textarea class="textarea" id="fPhrase" maxlength="120" aria-describedby="phraseCount">Treino cedo, corrida leve e carga moderada.</textarea>
+        <span class="count" id="phraseCount">42/120</span>
       </div>
       <div class="field">
-        <span class="label">Dias e horários</span>
-        <div class="chips" id="days" style="margin-top:0"></div>
-        <div class="card" style="margin-top:var(--s3)">
-          <div class="row"><div><b>Faixa de horário</b><small>19h às 21h</small></div><span class="tag tag-muted">Visível</span></div>
-        </div>
+        <label for="fGoal">Meta (opcional)</label>
+        <input class="input" id="fGoal" maxlength="60" value="Correr 10 km sem parar até dezembro">
       </div>
       <div class="field">
-        <span class="label">Prompts (até 3)</span>
-        <div class="card" id="prompts"></div>
+        <label for="fBio">Sobre você (opcional)</label>
+        <textarea class="textarea" id="fBio" maxlength="300">Gosto de treinar cedo e de conversar depois do treino.</textarea>
+        <span class="count" id="bioCount">55/300</span>
       </div>
       <div class="field">
-        <span class="label">Meta de treino</span>
-        <div class="card">
-          <div class="row"><div><b>Correr 10 km sem parar</b><small>Prazo: 31 de dezembro</small></div><button class="btn btn-g btn-sm">Trocar</button></div>
-        </div>
-      </div>
-      <div class="field">
-        <span class="label">Interesses (de 3 a 5)</span>
-        <div class="chips" id="interests" style="margin-top:0"></div>
-        <span class="hint" id="intHint">4 selecionados</span>
+        <span class="label">Foto (opcional)</span>
+        <p class="hint">Uma foto de rosto, de perfil ou de treino. Sem galeria. Iniciais aparecem enquanto não houver foto.</p>
       </div>
     </section>
 
-    <section class="screen" data-s="fotos">
-      <div class="section-head" style="margin-top:0"><div><h2>Fotos</h2><p id="fCount">2 de 6 · arraste para reordenar</p></div></div>
-      <div id="photos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2)"></div>
-      <p class="hint" style="margin-top:var(--s3)">Use fotos de treino ou do dia a dia. Rostos claros ajudam a criar confiança.</p>
-    </section>
-
+    <!-- ══════════ PRIVACIDADE ══════════ -->
     <section class="screen" data-s="privacidade">
-      <p class="preview-note">Padrão: horário e bairro começam ocultos. Você pode mudar cada campo a qualquer momento.</p>
-      <div class="card" id="privacyForm"></div>
-      <div class="notice" style="margin-top:var(--s4)">Localização exata nunca é publicada. Distâncias são arredondadas.</div>
+      <div class="seg" role="group" aria-label="Seções">
+        <button aria-pressed="false" data-go="treino">Treino</button>
+        <button aria-pressed="false" data-go="trilha">Trilha</button>
+        <button aria-pressed="false" data-go="sobre">Sobre</button>
+        <button aria-pressed="true" data-go="privacidade">Privacidade</button>
+        <button aria-pressed="false" data-go="seguranca">Segurança</button>
+      </div>
+      <p class="hint" style="margin-bottom:var(--s2)">Quem pode ver cada campo. Horário e bairro começam restritos.</p>
+      <div id="privacyForm"></div>
+      <p class="hint" style="margin-top:var(--s4)">Localização exata nunca é publicada. Distâncias são arredondadas em faixas.</p>
+    </section>
+
+    <!-- ══════════ SEGURANÇA ══════════ -->
+    <section class="screen" data-s="seguranca">
+      <div class="seg" role="group" aria-label="Seções">
+        <button aria-pressed="false" data-go="treino">Treino</button>
+        <button aria-pressed="false" data-go="trilha">Trilha</button>
+        <button aria-pressed="false" data-go="sobre">Sobre</button>
+        <button aria-pressed="false" data-go="privacidade">Privacidade</button>
+        <button aria-pressed="true" data-go="seguranca">Segurança</button>
+      </div>
+
+      <section class="block" style="padding-top:0">
+        <div class="block-h"><h2>Verificação</h2></div>
+        <p id="verifyText" style="font-size:var(--t-sm)">Confirme sua identidade para mostrar o selo “Verificado”. Sem selo, nada é exibido no lugar.</p>
+        <button class="btn btn-g btn-sm" id="verifyBtn" style="margin-top:var(--s3)">Iniciar verificação</button>
+      </section>
+
+      <section class="block">
+        <div class="block-h"><h2>Contato de confiança</h2></div>
+        <p class="hint" style="margin-top:0">Recebe sua localização só durante um treino combinado, com seu aviso.</p>
+        <div class="field" style="margin-top:var(--s3)">
+          <label for="cName">Nome</label>
+          <input class="input" id="cName" maxlength="40" placeholder="Ex.: Ana">
+        </div>
+        <div class="field">
+          <label for="cPhone">Telefone ou e-mail</label>
+          <input class="input" id="cPhone" maxlength="80" placeholder="Para receber o aviso">
+        </div>
+        <label class="check"><input type="checkbox" id="cConsent"> Ele(a) sabe que vou indicá-lo e aceita receber o aviso.</label>
+        <button class="btn btn-p btn-sm" id="saveContact" style="margin-top:var(--s3)">Salvar contato</button>
+      </section>
+
+      <section class="block">
+        <div class="block-h"><h2>Bloqueios e denúncias</h2></div>
+        <p class="hint" style="margin-top:0">Você pode bloquear ou denunciar qualquer perfil a partir da conversa ou da pré-visualização.</p>
+      </section>
     </section>
   </main>
 
   <div class="savebar" id="savebar" hidden>
     <button class="btn btn-g" id="cancel">Cancelar</button>
-    <button class="btn btn-p" id="save">Salvar alterações</button>
+    <button class="btn btn-p" id="save">Salvar</button>
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const TITLES={perfil:'Perfil',ver:'Como outros me veem',editar:'Editar perfil',musica:'Música para treinar',treino:'Treino',fotos:'Fotos',privacidade:'Privacidade'};
-const SUB={editar:'editar',musica:'editar',treino:'editar',fotos:'editar',privacidade:'editar'};
-const SPORTS=['Corrida','Musculação','Calistenia','Ciclismo','Natação','Yoga'];
-const DAYS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-const INTERESTS=['Corrida de rua','Yoga','Ciclismo','Nutrição','Calistenia','Natação','Trilhas','Crossfit','Musculação','Alongamento'];
+
+// ── catálogo de demonstração (fallback quando o proxy Spotify não está configurado) ──
 const CATALOG=[
   {t:'Faixa 01',a:'Artista demo A',c:'A1'},{t:'Faixa 02',a:'Artista demo B',c:'B2'},
   {t:'Faixa 03',a:'Artista demo C',c:'C3'},{t:'Faixa 04',a:'Artista demo D',c:'D4'},
   {t:'Faixa 05',a:'Artista demo E',c:'E5'},{t:'Faixa 06',a:'Artista demo F',c:'F6'},
 ];
-const PROMPTS=['Meu treino ideal é…','Me motiva…','Treino junto porque…'];
+const SPORTS=['Corrida','Musculação','Calistenia','Ciclismo','Natação','Yoga','Trilha'];
+const LEVELS=['Iniciante','Intermediário','Avançado'];
+const DAYS=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const HOURS=Array.from({length:17},(_,i)=>String(i+6).padStart(2,'0')+':00'); // 06:00–22:00
+const TITLES={perfil:'Meu treino',ver:'Como outros me veem',treino:'Treino',trilha:'Trilha',sobre:'Sobre você',privacidade:'Privacidade',seguranca:'Segurança'};
+const EDIT=['treino','trilha','sobre','privacidade','seguranca'];
+const PRIV_LABELS={horario:'Dias e horário',bairro:'Bairro aproximado',historico:'Histórico com parceiros',trilha:'Trilha de treino',meta:'Meta'};
+const PRIV_OPTS={public:'Público',partners:'Parceiros',private:'Só eu'};
 
 const state={
-  name:'Você', bio:'Gosto de treinar cedo, corrida leve e carga moderada.', city:'São Paulo · Pinheiros',
-  sports:['Corrida','Musculação'], days:['Ter','Qui'], interests:['Corrida de rua','Yoga','Nutrição','Ciclismo'],
-  tracks:[{t:'Faixa 01',a:'Artista demo A',c:'A1',fav:true},{t:'Faixa 02',a:'Artista demo B',c:'B2',fav:true},{t:'Faixa 03',a:'Artista demo C',c:'C3',fav:false}],
-  privacy:{foto:'public',musica:'public',bairro:'partners',horario:'partners',historico:'partners',metas:'public'},
-  prompts:['Meu treino ideal é correr cedo, sem pressa de chegar ao fim.'],
-  photos:2,
+  name:'Você', bio:'Gosto de treinar cedo e de conversar depois do treino.',
+  phrase:'Treino cedo, corrida leve e carga moderada.',
+  goal:'Correr 10 km sem parar até dezembro',
+  sports:['Corrida','Musculação'], level:'Intermediário', pace:'5:30',
+  days:['Ter','Qui'], from:'19:00', to:'21:00', neigh:'Pinheiros',
+  verified:false, verifyStatus:'none', contact:null,
+  presence:{done:0, rating:null, ratings:0},
+  tracks:[{t:'Faixa 01',a:'Artista demo A',c:'A1',fav:true},{t:'Faixa 02',a:'Artista demo B',c:'B2',fav:false}],
+  privacy:{horario:'partners',bairro:'partners',historico:'partners',trilha:'public',meta:'public'},
 };
-const PRIV_LABELS={foto:'Foto',musica:'Música de treino',bairro:'Bairro aproximado',horario:'Dias e horários',historico:'Histórico de treinos',metas:'Metas'};
-const PRIV_OPTS={public:'Público',partners:'Parceiros',private:'Privado'};
 
-let stack=[], dirty=false, current='perfil';
+let stack=[], current='perfil', snap=null;
 
 function go(name, push=true){
+  if(!TITLES[name]) name='perfil';
   if(push && name!==current) stack.push(current);
+  if(EDIT.includes(name)){ if(!snap) snap=JSON.stringify(state); }
+  else snap=null; // sair da edição confirma ou descarta (cancel restaura antes)
   current=name;
   $$('.screen').forEach(s=>s.toggleAttribute('data-on', s.dataset.s===name));
-  $('#title').textContent=TITLES[name]||'Perfil';
+  $('#title').textContent=TITLES[name];
   $('#back').hidden = name==='perfil';
-  $('#savebar').hidden = !SUB[name];
+  $('#savebar').hidden = !EDIT.includes(name);
   $$('.seg button[data-go]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.go===name)));
   $('#main').scrollTop=0;
   history.replaceState(null,'','#'+name);
 }
 document.addEventListener('click',e=>{
   const g=e.target.closest('[data-goto],[data-go]');
-  if(g){ go(g.dataset.goto||g.dataset.go); }
+  if(g) go(g.dataset.goto||g.dataset.go);
 });
-$('#back').addEventListener('click',()=>{ go(stack.pop()||'perfil', false); });
+$('#back').addEventListener('click',()=>go(stack.pop()||'perfil', false));
 
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2200); }
+function esc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function safeCover(u){ return typeof u==='string' && /^https:\/\//.test(u) ? u : null; }
+function initials(n){ return (n.trim().split(/\s+/).map(p=>p[0]||'').join('').slice(0,2).toUpperCase())||'VC'; }
 
-function initials(n){ return n.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase()||'VC'; }
-
-function pct(){
-  const checks=[!!state.name&&!!state.bio, state.sports.length>0, state.tracks.length>0, state.prompts.length>0, state.photos>=3, state.interests.length>=3];
-  return Math.round(checks.filter(Boolean).length/checks.length*100);
-}
-
+// ── perfil ──
 function renderProfile(){
   $('#pName').textContent=state.name; $('#vName').textContent=state.name;
   $('#initials').textContent=$('#vInitials').textContent=initials(state.name);
-  $('#pSub').textContent=state.sports.slice(0,3).join(' · ')+' · Intermediário';
-  $('#pBio').textContent=state.bio;
-  const fav=state.tracks.filter(t=>t.fav).length;
-  $('#trackCount').textContent=`${state.tracks.length} de 20 músicas · ${fav} destaque${fav===1?'':'s'}`;
-  const top=state.tracks.filter(t=>t.fav).concat(state.tracks.filter(t=>!t.fav));
-  $('#pTracks').innerHTML = top.length ? top.slice(0,3).map(t=>trackRow(t,false)).join('') : `<div class="empty">Nenhuma música ainda. Adicione a trilha do seu treino.</div>`;
-  $('#vTracks').innerHTML = state.privacy.musica==='private' ? `<div class="empty">Oculto pelo usuário.</div>` : top.slice(0,3).map(t=>trackRow(t,false)).join('') || `<div class="empty">Nenhuma música.</div>`;
-  $('#vAvail').textContent = state.privacy.horario==='private' ? 'Oculto' : 'Ter e qui, 19h–21h';
-  $('#vDist').textContent = state.privacy.bairro==='private' ? 'Localização oculta' : 'até 1 km';
-  $('#vHist').textContent = state.privacy.historico==='private' ? 'Oculto pelo usuário.' : 'Nenhum treino finalizado juntos ainda.';
-  const p=pct(); const done=Math.round(p/100*6);
-  $('#pctText').textContent=`${done} de 6`; $('#pctBar').style.transform=`scaleX(${p/100})`;
-  $('.bar-track').setAttribute('aria-valuenow', p);
-  const next = !state.prompts.length ? '<b>adicione um prompt</b> para abrir conversa com parceiros.' : state.interests.length<3 ? '<b>escolha pelo menos 3 interesses</b>.' : state.photos<3 ? '<b>adicione mais fotos</b> de treino.' : '<b>perfil completo</b>. Ótimo trabalho.';
-  $('#nextStep').innerHTML='Próximo passo: '+next;
-  $('#privacyPreview').innerHTML = Object.keys(state.privacy).slice(0,4).map(k=>`
-    <div class="row"><div><b>${PRIV_LABELS[k]}</b><small>${PRIV_OPTS[state.privacy[k]]}</small></div>
-    <span class="tag ${state.privacy[k]==='public'?'':'tag-muted'}">${state.privacy[k]==='public'?'Visível':'Restrito'}</span></div>`).join('');
+  $('#verifiedBadge').hidden = !state.verified;
+  $('#pSub').textContent=[state.sports.slice(0,2).join(' · '), state.level].filter(Boolean).join(' · ') || 'Defina sua modalidade';
+  $('#pStatus').lastChild.textContent = state.days.length ? ` Treina ${state.days.join('/').toLowerCase()} · ${state.from}–${state.to}` : ' Disponibilidade não definida';
+  $('#statDone').textContent=state.presence.done;
+  $('#statRating').textContent = state.presence.rating ? state.presence.rating.toFixed(1).replace('.',',')+' ★' : '—';
+  $('#statRatingSub').textContent = state.presence.ratings ? `${state.presence.ratings} avaliações de parceiros` : 'sem avaliações ainda';
+  $('#trustEmpty').hidden = state.presence.done>0;
+
+  const shownTime = state.privacy.horario==='private' ? 'Oculto' : `${state.days.join(', ')||'—'}, ${state.from}–${state.to}`;
+  $('#trainDl').innerHTML = [
+    ['Modalidades', state.sports.join(', ')||'—'],
+    ['Nível', state.level],
+    ['Ritmo', state.sports.includes('Corrida') ? `${state.pace} min/km` : '—'],
+    ['Disponibilidade', shownTime],
+    ['Bairro', state.neigh||'—'],
+  ].filter(([k,v])=>v!=='—').map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+
+  $('#pPhrase').textContent=state.phrase||'Sem frase ainda.';
+  $('#goalBlock').hidden = !state.goal;
+  $('#pGoal').textContent=state.goal;
+
+  const top=[...state.tracks.filter(t=>t.fav), ...state.tracks.filter(t=>!t.fav)].slice(0,3);
+  $('#pTracks').innerHTML = top.length ? top.map(t=>trackRow(t,false)).join('') : `<p class="empty">Nenhuma música na trilha ainda.</p>`;
+  $('#trackCount').textContent = state.tracks.length ? `${state.tracks.length} de 20 faixas` : '';
+
+  $('#pVerify').textContent = state.verified ? 'Verificado' : (state.verifyStatus==='pending' ? 'Em análise' : 'Não verificado');
+  $('#pVerify').className = state.verified ? 'ok' : '';
+  $('#pContact').textContent = state.contact ? state.contact.name : 'Não configurado';
+
+  // pré-visualização pública
+  $('#vDl').innerHTML = [
+    ['Modalidades', state.sports.join(', ')||'—'],
+    ['Nível', state.level],
+    ['Disponibilidade', state.privacy.horario==='private' ? 'Oculto' : `${state.days.join(', ')||'—'}, ${state.from}–${state.to}`],
+    ['Meta', state.privacy.meta==='private' ? 'Oculta' : state.goal],
+  ].filter(([k,v])=>v!=='—').map(([k,v])=>`<dt>${esc(k)}</dt><dd class="${v==='Oculto'||v==='Oculta'?'hidden-v':''}">${esc(v)}</dd>`).join('');
+  $('#vDist').textContent = state.privacy.bairro==='private' ? 'localização oculta' : 'até 1 km';
+  $('#vTracks').innerHTML = state.privacy.trilha==='private' ? `<p class="empty">Oculta pelo usuário.</p>` : (top.length ? top.map(t=>trackRow(t,false)).join('') : `<p class="empty">Sem trilha.</p>`);
+  $('#vHist').textContent = state.privacy.historico==='private' ? 'Oculto pelo usuário.' : (state.presence.done ? `${state.presence.done} treinos juntos` : 'Ainda sem treinos juntos.');
 }
 
-function trackRow(t,editable){
-  const star = editable ? `<button class="star" aria-pressed="${t.fav}" aria-label="${t.fav?'Remover destaque':'Destacar'} ${esc(t.t)}" data-fav="${esc(t.c)}"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button>`
-    : (t.fav?'<span class="tag">Destaque</span>':'');
-  const rm = editable ? `<button class="rm" data-rm="${esc(t.c)}">Remover</button>` : '';
-  return `<div class="track">${coverHtml(t)}<div><b>${esc(t.t)}</b><small>${esc(t.a)}</small></div>${editable?`<div style="display:flex;align-items:center;gap:4px">${star}${rm}</div>`:star}</div>`;
-}
-
-function renderMusic(){
-  $('#myTracks').innerHTML = state.tracks.length ? state.tracks.map(t=>trackRow(t,true)).join('') : `<div class="empty">Sua lista está vazia.</div>`;
-  const fav=state.tracks.filter(t=>t.fav).length;
-  $('#mCount').textContent=`${state.tracks.length} de 20 · ${fav} destaque${fav===1?'':'s'} (máx. 3)`;
-}
-// Busca: proxy /api/spotify/search (spec FR-014..FR-017). Se indisponível, cai no catálogo demo.
-let lastResults=[], searchSeq=0, searchTimer=null;
-// Dados de terceiros (Spotify) entram em HTML só escapados. Capas só https.
-function esc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function safeCover(u){ return typeof u==='string' && /^https:\/\//.test(u) ? u : null; }
+// ── trilha ──
 function coverHtml(t){
   const src=safeCover(t.cover);
-  return src
-    ? `<img class="cover" src="${esc(src)}" alt="" width="44" height="44" loading="lazy">`
-    : `<span class="cover" aria-hidden="true">${esc((t.t||'').slice(0,2).toUpperCase())}</span>`;
+  return src ? `<img class="cover" src="${esc(src)}" alt="" width="44" height="44" loading="lazy">`
+             : `<span class="cover" aria-hidden="true">${esc((t.t||'').slice(0,2).toUpperCase())}</span>`;
 }
+function trackRow(t,editable){
+  const star = editable
+    ? `<button class="star" aria-pressed="${!!t.fav}" aria-label="${t.fav?'Remover destaque de':'Destacar'} ${esc(t.t)}" data-fav="${esc(t.c)}"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button>`
+    : (t.fav ? `<span class="tag">Destaque</span>` : '');
+  const rm = editable ? `<button class="rm" data-rm="${esc(t.c)}">Remover</button>` : '';
+  const right = editable ? `<div style="display:flex;align-items:center;gap:2px">${star}${rm}</div>` : star;
+  return `<div class="track">${coverHtml(t)}<div><b>${esc(t.t)}</b><small>${esc(t.a)}</small></div>${right}</div>`;
+}
+function renderMusic(){
+  $('#myTracks').innerHTML = state.tracks.length ? state.tracks.map(t=>trackRow(t,true)).join('') : `<p class="empty">Sua trilha está vazia.</p>`;
+  const fav=state.tracks.filter(t=>t.fav).length;
+  $('#mCount').textContent=`Sua trilha · ${state.tracks.length}/20 · ${fav}/3 destaques`;
+}
+
+// busca: proxy /api/spotify/search; se indisponível, catálogo demo com aviso
+let lastResults=[], searchSeq=0, searchTimer=null;
 function setSource(msg){ $('#searchSource').textContent=msg; }
 async function runSearch(q){
   const seq=++searchSeq;
@@ -458,105 +534,115 @@ async function runSearch(q){
     if(seq!==searchSeq) return;
     lastResults=j.items.map(x=>({t:String(x.title||''),a:String(x.artist||''),c:String(x.id||''),cover:safeCover(x.cover),url:safeCover(x.url)}));
     setSource(j.attribution||'Dados do Spotify');
-    return lastResults;
   }catch(err){
     if(seq!==searchSeq) return;
     const hits=CATALOG.filter(t=>(t.t+' '+t.a).toLowerCase().includes(q.toLowerCase()));
     lastResults=hits.map(t=>({...t,cover:null,url:null}));
     setSource(err.message==='503' ? 'Spotify não configurado: mostrando catálogo de demonstração.' : 'Busca indisponível agora: mostrando catálogo de demonstração.');
-    return lastResults;
   }
 }
 function renderResults(q){
   const box=$('#results'); box.hidden=false;
-  if(!lastResults.length){ box.innerHTML=`<div class="empty">Nenhum resultado para "${esc(q)}".</div>`; return; }
+  if(!lastResults.length){ box.innerHTML=`<p class="empty">Nenhum resultado para “${esc(q)}”.</p>`; return; }
   box.innerHTML = lastResults.map(t=>{
     const added=state.tracks.some(x=>x.c===t.c);
     return `<div class="track">${coverHtml(t)}<div><b>${esc(t.t)}</b><small>${esc(t.a)}</small></div>
-      <button class="btn btn-g btn-sm" data-add="${esc(t.c)}" ${added?'disabled':''}>${added?'Adicionada':'Adicionar'}</button></div>`;
+      <button class="btn btn-g btn-sm" data-add="${esc(t.c)}" ${added?'disabled':''}>${added?'Na trilha':'Adicionar'}</button></div>`;
   }).join('');
 }
 $('#q').addEventListener('input',e=>{
   const q=e.target.value.trim(); const box=$('#results');
   clearTimeout(searchTimer);
-  if(!q){ box.hidden=true; box.innerHTML=''; lastResults=[]; setSource(''); return; }
+  if(!q){ box.hidden=true; box.innerHTML=''; lastResults=[]; setSource('Você não precisa de conta Spotify para escolher.'); return; }
   searchTimer=setTimeout(async()=>{ await runSearch(q); renderResults(q); },300);
 });
-document.addEventListener('click',e=>{
-  const add=e.target.closest('[data-add]'), fav=e.target.closest('[data-fav]'), rm=e.target.closest('[data-rm]');
-  if(add){
-    if(state.tracks.length>=20){ toast('Limite de 20 músicas atingido'); return; }
-    const t=lastResults.find(x=>x.c===add.dataset.add); if(!t) return;
-    state.tracks.push({...t,fav:false}); dirty=true;
-    renderMusic(); renderResults($('#q').value.trim()); toast('Música adicionada');
-  }
-  if(fav){
-    const t=state.tracks.find(x=>x.c===fav.dataset.fav);
-    if(!t.fav && state.tracks.filter(x=>x.fav).length>=3){ toast('Máximo de 3 destaques'); return; }
-    t.fav=!t.fav; dirty=true; renderMusic();
-  }
-  if(rm){ state.tracks=state.tracks.filter(x=>x.c!==rm.dataset.rm); dirty=true; renderMusic(); }
-});
 
-function renderChoices(){
-  $('#sports').innerHTML=SPORTS.map(s=>`<button class="chip" aria-pressed="${state.sports.includes(s)}" data-sport="${s}">${s}</button>`).join('');
-  $('#days').innerHTML=DAYS.map(d=>`<button class="chip" aria-pressed="${state.days.includes(d)}" data-day="${d}">${d}</button>`).join('');
-  $('#interests').innerHTML=INTERESTS.map(i=>`<button class="chip" aria-pressed="${state.interests.includes(i)}" data-int="${i}">${i}</button>`).join('');
-  $('#intHint').textContent = state.interests.length<3 ? `Escolha ao menos 3 (${state.interests.length} selecionados)` : `${state.interests.length} selecionados`;
-  $('#intHint').style.color = state.interests.length<3 ? '#B42318' : '';
-  $('#prompts').innerHTML = PROMPTS.map((p,i)=>{
-    const a=state.prompts[i];
-    return `<div class="row" style="grid-template-columns:1fr"><div><b>${p}</b><small>${a?a:'Sem resposta'}</small></div></div>`;
-  }).join('');
-  $('#fCount').textContent=`${state.photos} de 6 · arraste para reordenar`;
-  $('#photos').innerHTML = Array.from({length:6},(_,i)=> i<state.photos
-    ? `<div style="aspect-ratio:3/4;border-radius:var(--r-sm);background:var(--surface-warm);display:grid;place-items:center;color:var(--accent-text);font-weight:800;position:relative">${i+1}<button class="rm" style="position:absolute;top:4px;right:4px;min-height:28px;padding:0 6px;background:var(--bg)" data-delphoto="${i}" aria-label="Remover foto ${i+1}">×</button></div>`
-    : `<button ${i===state.photos?'':'disabled'} data-addphoto style="aspect-ratio:3/4;border:1.5px dashed var(--border);border-radius:var(--r-sm);color:var(--fg-2);font-size:var(--t-sm);font-weight:700">+ Foto</button>`).join('');
+// ── escolhas (treino, privacidade) ──
+function toggle(arr,v){ const k=arr.indexOf(v); k>=0?arr.splice(k,1):arr.push(v); }
+function renderTrainForm(){
+  $('#sports').innerHTML=SPORTS.map(s=>`<button class="chip" aria-pressed="${state.sports.includes(s)}" data-sport="${esc(s)}">${esc(s)}</button>`).join('');
+  $('#levels').innerHTML=LEVELS.map(l=>`<button class="chip" aria-pressed="${state.level===l}" data-level="${esc(l)}">${esc(l)}</button>`).join('');
+  $('#days').innerHTML=DAYS.map(d=>`<button class="chip" aria-pressed="${state.days.includes(d)}" data-day="${esc(d)}">${esc(d)}</button>`).join('');
+  const opts=(sel)=>HOURS.map(h=>`<option value="${h}" ${h===sel?'selected':''}>${h}</option>`).join('');
+  $('#from').innerHTML=opts(state.from); $('#to').innerHTML=opts(state.to);
+  $('#pace').disabled = !state.sports.includes('Corrida');
   $('#privacyForm').innerHTML = Object.keys(PRIV_LABELS).map(k=>`
-    <div class="row"><div><b>${PRIV_LABELS[k]}</b><small>${PRIV_OPTS[state.privacy[k]]}</small></div>
-      <div class="vis" role="group" aria-label="Visibilidade de ${PRIV_LABELS[k]}">
+    <div class="prow"><div><b>${esc(PRIV_LABELS[k])}</b><small>${esc(PRIV_OPTS[state.privacy[k]])}</small></div>
+      <div class="vis" role="group" aria-label="Visibilidade: ${esc(PRIV_LABELS[k])}">
         ${Object.keys(PRIV_OPTS).map(o=>`<button aria-pressed="${state.privacy[k]===o}" data-priv="${k}" data-val="${o}">${PRIV_OPTS[o]}</button>`).join('')}
       </div></div>`).join('');
-  $('#cancel').disabled=false;
+  $('#verifyBtn').textContent = state.verified ? 'Verificado' : (state.verifyStatus==='pending' ? 'Em análise' : 'Iniciar verificação');
+  $('#verifyBtn').disabled = state.verified || state.verifyStatus==='pending';
+  $('#verifyText').textContent = state.verified ? 'Seu perfil está verificado. O selo aparece no seu perfil.' : (state.verifyStatus==='pending' ? 'Recebemos sua solicitação. Avisaremos quando for concluída.' : 'Confirme sua identidade para mostrar o selo “Verificado”. Sem selo, nada é exibido no lugar.');
 }
 document.addEventListener('click',e=>{
-  const s=e.target.closest('[data-sport]'), d=e.target.closest('[data-day]'), i=e.target.closest('[data-int]'), p=e.target.closest('[data-priv]');
-  const ph=e.target.closest('[data-addphoto]'), dp=e.target.closest('[data-delphoto]');
+  const s=e.target.closest('[data-sport]'), l=e.target.closest('[data-level]'), d=e.target.closest('[data-day]'), p=e.target.closest('[data-priv]');
+  const fav=e.target.closest('[data-fav]'), rm=e.target.closest('[data-rm]'), add=e.target.closest('[data-add]');
   if(s){ toggle(state.sports,s.dataset.sport); }
+  if(l){ state.level=l.dataset.level; }
   if(d){ toggle(state.days,d.dataset.day); }
-  if(i){
-    const has=state.interests.includes(i.dataset.int);
-    if(!has && state.interests.length>=5){ toast('Máximo de 5 interesses'); return; }
-    toggle(state.interests,i.dataset.int);
-  }
   if(p){ state.privacy[p.dataset.priv]=p.dataset.val; }
-  if(ph && state.photos<6){ state.photos++; }
-  if(dp){ state.photos--; }
-  if(s||d||i||p||ph||dp){ dirty=true; renderChoices(); renderProfile(); }
+  if(fav){
+    const t=state.tracks.find(x=>x.c===fav.dataset.fav);
+    if(t && !t.fav && state.tracks.filter(x=>x.fav).length>=3){ toast('Máximo de 3 destaques'); return; }
+    if(t) t.fav=!t.fav; renderMusic();
+  }
+  if(rm){ state.tracks=state.tracks.filter(x=>x.c!==rm.dataset.rm); renderMusic(); }
+  if(add){
+    if(state.tracks.length>=20){ toast('Sua trilha tem o limite de 20 faixas'); return; }
+    const t=lastResults.find(x=>x.c===add.dataset.add); if(!t) return;
+    state.tracks.push({...t,fav:false}); renderMusic(); renderResults($('#q').value.trim()); toast('Adicionada à trilha');
+  }
+  if(s||l||d||p) { renderTrainForm(); }
+  if(s||l||d||p||fav||rm||add) { /* perfil atualizado ao salvar */ }
 });
-function toggle(arr,v){ const k=arr.indexOf(v); k>=0?arr.splice(k,1):arr.push(v); }
+$('#pace').addEventListener('input',e=>{ state.pace=e.target.value; });
+$('#neigh').addEventListener('input',e=>{ state.neigh=e.target.value; });
+$('#from').addEventListener('change',e=>{ state.from=e.target.value; });
+$('#to').addEventListener('change',e=>{ state.to=e.target.value; });
+$('#fName').addEventListener('input',e=>{ state.name=e.target.value; });
+$('#fPhrase').addEventListener('input',e=>{ state.phrase=e.target.value; $('#phraseCount').textContent=`${e.target.value.length}/120`; });
+$('#fGoal').addEventListener('input',e=>{ state.goal=e.target.value; });
+$('#fBio').addEventListener('input',e=>{ state.bio=e.target.value; const n=e.target.value.length; const c=$('#bioCount'); c.textContent=`${n}/300`; c.classList.toggle('over',n>=300); });
 
-// campos básicos
-$('#fName').addEventListener('input',e=>{ state.name=e.target.value; dirty=true; renderProfile(); });
-$('#fBio').addEventListener('input',e=>{ state.bio=e.target.value; const n=e.target.value.length; const c=$('#bioCount'); c.textContent=`${n}/300`; c.classList.toggle('over',n>=300); dirty=true; renderProfile(); });
-$('#fCity').addEventListener('input',e=>{ state.city=e.target.value; dirty=true; });
+// segurança
+$('#verifyBtn').addEventListener('click',()=>{ state.verifyStatus='pending'; renderTrainForm(); toast('Solicitação de verificação enviada'); });
+$('#saveContact').addEventListener('click',()=>{
+  const name=$('#cName').value.trim(), phone=$('#cPhone').value.trim();
+  if(!name||!phone){ toast('Preencha nome e contato'); return; }
+  if(!$('#cConsent').checked){ toast('Confirme que ele(a) sabe e aceita'); return; }
+  state.contact={name, phone}; renderProfile(); toast('Contato de confiança salvo');
+});
+$('#fakeBlock').addEventListener('click',()=>toast('Bloqueado. Este perfil não aparecerá para você.'));
+$('#fakeReport').addEventListener('click',()=>toast('Denúncia registrada. Nossa equipe vai revisar.'));
 
+// salvar / cancelar
 $('#save').addEventListener('click',()=>{
-  if(state.interests.length<3){ toast('Escolha pelo menos 3 interesses'); go('treino'); return; }
-  dirty=false; toast('Perfil salvo'); go('perfil');
+  const phraseOk = state.phrase.length<=120;
+  if(!phraseOk){ toast('Frase com mais de 120 caracteres'); return; }
+  if(state.sports.length===0){ toast('Escolha ao menos uma modalidade'); go('treino'); return; }
+  snap=null; renderProfile(); toast('Perfil salvo'); go('perfil');
 });
-$('#cancel').addEventListener('click',()=>{ dirty=false; toast('Alterações descartadas'); go('perfil'); });
+$('#cancel').addEventListener('click',()=>{
+  if(snap){ Object.assign(state, JSON.parse(snap)); }
+  snap=null; renderProfile(); renderMusic(); renderTrainForm();
+  $('#fName').value=state.name; $('#fPhrase').value=state.phrase; $('#fGoal').value=state.goal; $('#fBio').value=state.bio;
+  $('#pace').value=state.pace; $('#neigh').value=state.neigh;
+  toast('Alterações descartadas'); go('perfil');
+});
 
 // tema
 const root=document.documentElement;
-function setIcon(){ const dark=getComputedStyle(root).colorScheme.includes('dark') && !matchMedia('(prefers-color-scheme: light)').matches || root.dataset.theme==='dark';
-  $('#theme-ico').innerHTML = dark ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>' : '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'; }
-$('#theme').addEventListener('click',()=>{ const next=(root.dataset.theme==='dark'||(!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches))?'light':'dark'; root.dataset.theme=next; localStorage.setItem('movase-theme',next); setIcon(); });
-const saved=localStorage.getItem('movase-theme'); if(saved) root.dataset.theme=saved; setIcon();
+function isDark(){ return root.dataset.theme==='dark' || (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches); }
+function setIcon(){ $('#theme-ico').innerHTML = isDark() ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>' : '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'; }
+$('#theme').addEventListener('click',()=>{ root.dataset.theme = isDark() ? 'light' : 'dark'; localStorage.setItem('movase-theme',root.dataset.theme); setIcon(); });
+const savedTheme=localStorage.getItem('movase-theme'); if(savedTheme) root.dataset.theme=savedTheme; setIcon();
 
 // inicial
-renderProfile(); renderMusic(); renderChoices();
-const start=location.hash.replace('#','')||'perfil';
+$('#fBio').dispatchEvent(new Event('input'));
+$('#fPhrase').dispatchEvent(new Event('input'));
+renderProfile(); renderMusic(); renderTrainForm();
+const start=location.hash.replace('#','');
 go(TITLES[start]?start:'perfil', false);
 </script>
 </body>
