@@ -1,0 +1,5 @@
+.playwright-mcp
+test-results
+node_modules
+.git
+*.log
