@@ -144,6 +144,11 @@ Como usuário, quero escolher o que é visível para outros treinos (foto, músi
 - **FR-011**: O sistema DEVE mostrar progresso de completude do perfil (ex.: 4 de 6 etapas) com orientação do próximo passo.
 - **FR-012**: O sistema DEVE exibir o perfil público como outro usuário veria, em modo de pré-visualização.
 - **FR-013**: O sistema DEVE mostrar a música de treino no cabeçalho do chat e no início de um treino combinado.
+- **FR-014**: A busca de músicas DEVE usar a Spotify Web API por meio de um proxy no servidor (função serverless). O client secret NUNCA DEVE ir ao navegador nem ao repositório.
+- **FR-015**: A busca DEVE usar o fluxo Client Credentials (token do app, sem login do usuário). O usuário final NÃO precisa ter conta Spotify para escolher músicas.
+- **FR-016**: O sistema DEVE limitar os resultados a 10 por busca (limite do modo de desenvolvimento) e DEVE exibir a atribuição "Dados do Spotify" nos resultados.
+- **FR-017**: Se o proxy não estiver configurado ou falhar, o sistema DEVE cair para o catálogo de demonstração e informar isso ao usuário, sem quebrar a tela.
+- **FR-018**: A reprodução de áudio NÃO faz parte deste escopo: a música é escolhida, exibida com capa e título, e não tocada dentro do app.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -168,7 +173,9 @@ Como usuário, quero escolher o que é visível para outros treinos (foto, músi
 
 ## Assumptions
 
-- A busca de músicas usa um catálogo de terceiro com licença própria. Sem login obrigatório; integração por conta é opcional em fase posterior.
+- Spotify Web API em modo de desenvolvimento (gratuito). Restrições verificadas em 2026: o dono do app precisa de Spotify Premium; o limite de usuários (5) e a allowlist valem para tokens de usuário, não para client credentials; a cota é compartilhada por conta de desenvolvedor; `/search` aceita no máximo 10 resultados.
+- Publicação para público amplo exige "extended quota", que a Spotify só aceita de organizações com serviço ativo e pelo menos 250 mil usuários ativos por mês. Fora do escopo deste spec; sem isso o app continua limitado no modo de desenvolvimento.
+- Se o dono do app perder o Premium, as chamadas param de funcionar até a reativação.
 - Moderação de fotos e textos é feita por revisão automática com revisão humana para denúncias. A implementação dessa moderação está fora do escopo deste spec.
 - O app já tem autenticação e identificador de usuário. Este spec não cria login.
 - O protótipo atual (`movase-treino*.html`) é client-side. Persistência real exige backend, que não existe neste workspace.

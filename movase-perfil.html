@@ -130,6 +130,7 @@ h3{font-size:var(--t-base);line-height:1.3;font-weight:700}
 .track{display:grid;grid-template-columns:44px 1fr auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s4)}
 .track+.track{border-top:1px solid var(--border)}
 .cover{width:44px;height:44px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--surface-warm);color:var(--accent-text);font-weight:800;font-size:var(--t-sm)}
+img.cover{object-fit:cover;padding:0}
 .track b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track small{display:block;color:var(--meta);font-size:var(--t-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .star{min-width:44px;min-height:44px;display:grid;place-items:center;border-radius:var(--r-pill);color:var(--fg-2)}
@@ -285,7 +286,7 @@ h3{font-size:var(--t-base);line-height:1.3;font-weight:700}
       <div class="field" style="margin-top:0">
         <label for="q">Buscar música</label>
         <input class="input" id="q" type="search" placeholder="Música ou artista" autocomplete="off">
-        <span class="hint">Catálogo de demonstração. A busca real depende da integração do serviço de música.</span>
+        <span class="hint" id="searchSource">Digite para buscar músicas no Spotify. Você não precisa de conta Spotify.</span>
       </div>
       <div class="card results" id="results" hidden></div>
       <div class="section" style="margin-top:var(--s5)">
@@ -425,10 +426,10 @@ function renderProfile(){
 }
 
 function trackRow(t,editable){
-  const star = editable ? `<button class="star" aria-pressed="${t.fav}" aria-label="${t.fav?'Remover destaque':'Destacar'} ${t.t}" data-fav="${t.c}"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button>`
+  const star = editable ? `<button class="star" aria-pressed="${t.fav}" aria-label="${t.fav?'Remover destaque':'Destacar'} ${esc(t.t)}" data-fav="${esc(t.c)}"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></button>`
     : (t.fav?'<span class="tag">Destaque</span>':'');
-  const rm = editable ? `<button class="rm" data-rm="${t.c}">Remover</button>` : '';
-  return `<div class="track"><span class="cover" aria-hidden="true">${t.c}</span><div><b>${t.t}</b><small>${t.a}</small></div>${editable?`<div style="display:flex;align-items:center;gap:4px">${star}${rm}</div>`:star}</div>`;
+  const rm = editable ? `<button class="rm" data-rm="${esc(t.c)}">Remover</button>` : '';
+  return `<div class="track">${coverHtml(t)}<div><b>${esc(t.t)}</b><small>${esc(t.a)}</small></div>${editable?`<div style="display:flex;align-items:center;gap:4px">${star}${rm}</div>`:star}</div>`;
 }
 
 function renderMusic(){
@@ -436,23 +437,58 @@ function renderMusic(){
   const fav=state.tracks.filter(t=>t.fav).length;
   $('#mCount').textContent=`${state.tracks.length} de 20 · ${fav} destaque${fav===1?'':'s'} (máx. 3)`;
 }
-$('#q').addEventListener('input',e=>{
-  const q=e.target.value.trim().toLowerCase(); const box=$('#results');
-  if(!q){ box.hidden=true; box.innerHTML=''; return; }
-  const hits=CATALOG.filter(t=>(t.t+' '+t.a).toLowerCase().includes(q));
-  box.hidden=false;
-  box.innerHTML = hits.length ? hits.map(t=>{
+// Busca: proxy /api/spotify/search (spec FR-014..FR-017). Se indisponível, cai no catálogo demo.
+let lastResults=[], searchSeq=0, searchTimer=null;
+// Dados de terceiros (Spotify) entram em HTML só escapados. Capas só https.
+function esc(v){ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function safeCover(u){ return typeof u==='string' && /^https:\/\//.test(u) ? u : null; }
+function coverHtml(t){
+  const src=safeCover(t.cover);
+  return src
+    ? `<img class="cover" src="${esc(src)}" alt="" width="44" height="44" loading="lazy">`
+    : `<span class="cover" aria-hidden="true">${esc((t.t||'').slice(0,2).toUpperCase())}</span>`;
+}
+function setSource(msg){ $('#searchSource').textContent=msg; }
+async function runSearch(q){
+  const seq=++searchSeq;
+  try{
+    const r=await fetch('/api/spotify/search?q='+encodeURIComponent(q)+'&limit=8');
+    if(!r.ok) throw new Error(String(r.status));
+    const j=await r.json();
+    if(seq!==searchSeq) return;
+    lastResults=j.items.map(x=>({t:String(x.title||''),a:String(x.artist||''),c:String(x.id||''),cover:safeCover(x.cover),url:safeCover(x.url)}));
+    setSource(j.attribution||'Dados do Spotify');
+    return lastResults;
+  }catch(err){
+    if(seq!==searchSeq) return;
+    const hits=CATALOG.filter(t=>(t.t+' '+t.a).toLowerCase().includes(q.toLowerCase()));
+    lastResults=hits.map(t=>({...t,cover:null,url:null}));
+    setSource(err.message==='503' ? 'Spotify não configurado: mostrando catálogo de demonstração.' : 'Busca indisponível agora: mostrando catálogo de demonstração.');
+    return lastResults;
+  }
+}
+function renderResults(q){
+  const box=$('#results'); box.hidden=false;
+  if(!lastResults.length){ box.innerHTML=`<div class="empty">Nenhum resultado para "${esc(q)}".</div>`; return; }
+  box.innerHTML = lastResults.map(t=>{
     const added=state.tracks.some(x=>x.c===t.c);
-    return `<div class="track"><span class="cover" aria-hidden="true">${t.c}</span><div><b>${t.t}</b><small>${t.a}</small></div>
-      <button class="btn btn-g btn-sm" data-add="${t.c}" ${added?'disabled':''}>${added?'Adicionada':'Adicionar'}</button></div>`;
-  }).join('') : `<div class="empty">Nenhum resultado para "${e.target.value}".</div>`;
+    return `<div class="track">${coverHtml(t)}<div><b>${esc(t.t)}</b><small>${esc(t.a)}</small></div>
+      <button class="btn btn-g btn-sm" data-add="${esc(t.c)}" ${added?'disabled':''}>${added?'Adicionada':'Adicionar'}</button></div>`;
+  }).join('');
+}
+$('#q').addEventListener('input',e=>{
+  const q=e.target.value.trim(); const box=$('#results');
+  clearTimeout(searchTimer);
+  if(!q){ box.hidden=true; box.innerHTML=''; lastResults=[]; setSource(''); return; }
+  searchTimer=setTimeout(async()=>{ await runSearch(q); renderResults(q); },300);
 });
 document.addEventListener('click',e=>{
   const add=e.target.closest('[data-add]'), fav=e.target.closest('[data-fav]'), rm=e.target.closest('[data-rm]');
   if(add){
     if(state.tracks.length>=20){ toast('Limite de 20 músicas atingido'); return; }
-    const t=CATALOG.find(x=>x.c===add.dataset.add); state.tracks.push({...t,fav:false}); dirty=true;
-    renderMusic(); $('#q').dispatchEvent(new Event('input')); toast('Música adicionada');
+    const t=lastResults.find(x=>x.c===add.dataset.add); if(!t) return;
+    state.tracks.push({...t,fav:false}); dirty=true;
+    renderMusic(); renderResults($('#q').value.trim()); toast('Música adicionada');
   }
   if(fav){
     const t=state.tracks.find(x=>x.c===fav.dataset.fav);
